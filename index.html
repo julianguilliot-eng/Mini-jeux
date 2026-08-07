@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Mini-Jeux</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-1:#CDEBFB;
+    --bg-2:#4C93C7;
+    --panel:#F4FAFF;
+    --ink:#1C3A52;
+    --wood-1:#2E6690;
+    --wood-2:#153650;
+    --teal:#2C8C7E;
+    --teal-dark:#1F6B60;
+    --coral:#F0562E;
+    --coral-dark:#C7411E;
+    --gold:#F4B93E;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html, body{
+    overscroll-behavior:contain;
+    height:100%;
+    margin:0;
+  }
+  body{
+    font-family:'Nunito',sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(circle at 15% 10%, rgba(255,255,255,0.35), transparent 40%),
+      linear-gradient(160deg,var(--bg-1) 0%,var(--bg-2) 100%);
+    -webkit-user-select:none; user-select:none;
+    -webkit-touch-callout:none;
+  }
+  h1,h2{ font-family:'Fredoka',sans-serif; margin:0; }
+  button{ font-family:'Fredoka',sans-serif; cursor:pointer; border:none; }
+
+  .screen{ display:none; }
+  .screen.active{ display:flex; }
+
+  /* ---------- HOME SCREEN ---------- */
+  #screenHome{
+    position:fixed; inset:0 0 0 0; top:0; left:0; right:0; bottom:0;
+    flex-direction:column;
+    align-items:center;
+    padding:20px 16px;
+    overflow:hidden;
+  }
+  #homeHeader{
+    flex:0 0 auto;
+    text-align:center;
+    margin-bottom:10px;
+  }
+  #homeHeader h1{
+    font-size:clamp(28px,5vw,42px);
+    color:var(--wood-2);
+    text-shadow:2px 3px 0 rgba(255,255,255,0.5);
+  }
+  #homeHeader p{
+    margin:4px 0 0;
+    font-weight:700;
+    opacity:0.75;
+    font-size:14px;
+  }
+  #gameGrid{
+    flex:1 1 auto;
+    min-height:0;
+    width:100%;
+    max-width:1100px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(140px,1fr));
+    grid-auto-rows:1fr;
+    gap:12px;
+    overflow:hidden;
+    padding:6px;
+  }
+  .game-card{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    border-radius:20px;
+    color:white;
+    font-weight:700;
+    font-size:clamp(12px,1.6vw,15px);
+    text-align:center;
+    padding:8px;
+    box-shadow:0 6px 0 rgba(0,0,0,0.18);
+    transition:transform .08s ease;
+  }
+  .game-card:active{ transform:translateY(4px); box-shadow:0 2px 0 rgba(0,0,0,0.18); }
+  .game-card .ic{ font-size:clamp(30px,4.5vw,46px); }
+
+  /* ---------- GAME SCREEN SHELL ---------- */
+  #screenGame.active{
+    position:fixed; top:0; left:0; right:0; bottom:0;
+    flex-direction:column;
+    z-index:10;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(255,255,255,0.35), transparent 40%),
+      linear-gradient(160deg,var(--bg-1) 0%,var(--bg-2) 100%);
+  }
+  .topbar{
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    padding:10px 12px;
+  }
+  .topbar .tb-title{
+    font-weight:700;
+    font-size:clamp(16px,3vw,24px);
+    color:var(--wood-2);
+    text-align:center;
+    flex:1;
+  }
+  .topbar-right{ display:flex; gap:6px; }
+  .tb-btn{
+    border-radius:14px;
+    padding:9px 14px;
+    font-size:14px;
+    font-weight:600;
+    color:white;
+    background:var(--teal);
+    box-shadow:0 4px 0 var(--teal-dark);
+  }
+  .tb-btn:active{ transform:translateY(3px); box-shadow:0 1px 0 var(--teal-dark); }
+  .tb-btn.ghost{ background:var(--panel); color:var(--wood-2); box-shadow:0 4px 0 rgba(21,54,80,0.3); }
+  .tb-btn.ghost:active{ box-shadow:0 1px 0 rgba(21,54,80,0.3); }
+  .tb-btn.icon{ padding:9px 12px; font-size:16px; line-height:1; }
+  .tb-btn.hidden{ display:none; }
+
+  #gameArea{
+    flex:1 1 auto;
+    min-height:0;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:8px 14px 14px;
+  }
+  .game-root{
+    width:100%; height:100%;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    gap:10px;
+  }
+  .game-instructions{
+    flex:0 0 auto;
+    font-weight:700;
+    font-size:clamp(13px,2.2vw,17px);
+    color:var(--wood-2);
+    text-align:center;
+    background:rgba(255,255,255,0.55);
+    padding:6px 16px;
+    border-radius:14px;
+  }
+  .game-stage{
+    flex:1 1 auto;
+    min-height:0;
+    width:100%;
+    max-width:1100px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  /* ---------- shared toast ---------- */
+  #toast{
+    position:fixed;
+    left:50%; top:14px;
+    transform:translateX(-50%) scale(0.85);
+    opacity:0;
+    background:var(--gold);
+    color:var(--wood-2);
+    font-family:'Fredoka',sans-serif;
+    font-weight:700;
+    font-size:clamp(16px,3vw,22px);
+    padding:12px 24px;
+    border-radius:18px;
+    box-shadow:0 6px 0 #C98F1F;
+    z-index:999;
+    pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease;
+  }
+  #toast.show{ opacity:1; transform:translateX(-50%) scale(1); }
+
+  /* ---------- generic shape helpers ---------- */
+  .shp{ display:inline-block; }
+  .shp-circle{ border-radius:50%; }
+  .shp-square{ border-radius:8px; }
+  .shp-triangle{ clip-path:polygon(50% 0%,0% 100%,100% 100%); }
+  .shp-diamond{ clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%); }
+  .shp-hexagon{ clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); }
+  .shp-star{ clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); }
+
+  /* ================= MEMORY ================= */
+  #memGrid{
+    display:grid; gap:8px;
+    width:100%; height:100%;
+  }
+  .mem-card{
+    border-radius:14px;
+    background:linear-gradient(155deg,var(--wood-1),var(--wood-2));
+    box-shadow:0 4px 0 rgba(0,0,0,0.2);
+    display:flex; align-items:center; justify-content:center;
+    font-size:clamp(22px,6vw,54px);
+    transition:transform .25s;
+    transform-style:preserve-3d;
+  }
+  .mem-card .face{ display:none; }
+  .mem-card.flipped .face-front, .mem-card.matched .face-front{ display:none; }
+  .mem-card.flipped .face-back, .mem-card.matched .face-back{ display:flex; }
+  .mem-card:not(.flipped):not(.matched) .face-front{ display:flex; }
+  .face{ width:100%; height:100%; align-items:center; justify-content:center; }
+  .face-front{ color:rgba(255,255,255,0.65); font-size:clamp(18px,4vw,30px); }
+  .mem-card.matched{ background:rgba(255,255,255,0.5); box-shadow:0 0 0 3px var(--teal) inset; }
+
+  /* ================= SHAPE SORTER ================= */
+  #shapeStage{ display:flex; flex-direction:column; gap:18px; width:100%; height:100%; align-items:center; justify-content:center; }
+  #shapeSlots{ display:flex; gap:14px; flex-wrap:wrap; align-items:center; justify-content:center; }
+  .shape-slot{
+    width:clamp(50px,10vw,90px); height:clamp(50px,10vw,90px);
+    border:3px dashed rgba(21,54,80,0.35);
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+  }
+  #shapeTray{ display:flex; gap:14px; flex-wrap:wrap; align-items:center; justify-content:center; }
+  .shape-piece{
+    width:clamp(50px,10vw,90px); height:clamp(50px,10vw,90px);
+    box-shadow:0 4px 0 rgba(0,0,0,0.25);
+    touch-action:none;
+    cursor:grab;
+  }
+  .shape-piece.placed{ visibility:hidden; }
+
+  /* ================= BUBBLES ================= */
+  #bubbleStage{ position:relative; width:100%; height:100%; }
+  .bubble{
+    position:absolute;
+    border-radius:50%;
+    background:rgba(255,255,255,0.55);
+    box-shadow:0 4px 10px rgba(0,0,0,0.15), inset 0 -4px 8px rgba(255,255,255,0.6);
+    display:flex; align-items:center; justify-content:center;
+    font-size:clamp(20px,5vw,40px);
+    touch-action:none;
+    transition:transform .15s ease, opacity .15s ease;
+  }
+  .bubble.pop{ transform:scale(1.6); opacity:0; }
+
+  /* ================= COUNT ================= */
+  #countRow{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:center; font-size:clamp(30px,7vw,60px); }
+  #countChoices{ display:flex; gap:16px; }
+  .count-btn{
+    width:clamp(60px,10vw,90px); height:clamp(60px,10vw,90px);
+    border-radius:18px;
+    background:var(--coral);
+    color:white;
+    font-size:clamp(24px,5vw,36px);
+    font-weight:700;
+    box-shadow:0 5px 0 var(--coral-dark);
+  }
+  .count-btn:active{ transform:translateY(4px); box-shadow:0 1px 0 var(--coral-dark); }
+
+  /* ================= COLORING ================= */
+  #colorStage{ display:flex; flex-direction:column; align-items:center; gap:14px; width:100%; height:100%; justify-content:center; }
+  #colorSvgWrap{ flex:1 1 auto; min-height:0; display:flex; align-items:center; justify-content:center; }
+  #colorSvgWrap svg{ max-width:100%; max-height:100%; }
+  #colorSvgWrap path, #colorSvgWrap ellipse, #colorSvgWrap circle, #colorSvgWrap polygon, #colorSvgWrap rect{
+    cursor:pointer;
+    stroke:#22303c; stroke-width:3;
+  }
+  #palette{ display:flex; gap:10px; flex:0 0 auto; flex-wrap:wrap; justify-content:center; }
+  .swatch{
+    width:clamp(34px,6vw,46px); height:clamp(34px,6vw,46px);
+    border-radius:50%;
+    box-shadow:0 3px 0 rgba(0,0,0,0.2);
+    border:3px solid white;
+  }
+  .swatch.selected{ box-shadow:0 0 0 3px var(--wood-2), 0 3px 0 rgba(0,0,0,0.2); }
+
+  /* ================= ANIMAL SOUNDS ================= */
+  #animalGrid{ display:grid; gap:14px; width:100%; height:100%; }
+  .animal-btn{
+    border-radius:20px;
+    background:var(--panel);
+    box-shadow:0 5px 0 rgba(21,54,80,0.25);
+    display:flex; align-items:center; justify-content:center;
+    font-size:clamp(30px,7vw,64px);
+  }
+  .animal-btn:active{ transform:translateY(4px); box-shadow:0 1px 0 rgba(21,54,80,0.25); }
+  .animal-btn.bounce{ animation:abounce .5s ease; }
+  @keyframes abounce{ 0%,100%{transform:scale(1);} 40%{transform:scale(1.25);} }
+
+  /* ================= COLOR HUNT ================= */
+  #colorHuntTarget{ font-size:clamp(60px,14vw,120px); }
+  #colorHuntOptions{ display:flex; gap:18px; flex-wrap:wrap; justify-content:center; }
+  .ch-opt{
+    width:clamp(64px,11vw,100px); height:clamp(64px,11vw,100px);
+    border-radius:18px;
+    background:var(--panel);
+    box-shadow:0 5px 0 rgba(21,54,80,0.25);
+    display:flex; align-items:center; justify-content:center;
+    font-size:clamp(28px,6vw,50px);
+  }
+  .ch-opt:active{ transform:translateY(4px); box-shadow:0 1px 0 rgba(21,54,80,0.25); }
+
+  /* ================= SHADOWS ================= */
+  #shadowTargetWrap{ font-size:clamp(50px,11vw,90px); }
+  #shadowOptions{ display:flex; gap:18px; }
+  .shadow-opt{
+    font-size:clamp(50px,11vw,90px);
+    filter:brightness(0);
+    opacity:0.85;
+  }
+  .shadow-opt-wrap{
+    width:clamp(70px,14vw,120px); height:clamp(70px,14vw,120px);
+    border-radius:18px;
+    background:var(--panel);
+    box-shadow:0 5px 0 rgba(21,54,80,0.25);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .shadow-opt-wrap:active{ transform:translateY(4px); box-shadow:0 1px 0 rgba(21,54,80,0.25); }
+
+  /* ================= CONNECT DOTS ================= */
+  #dotsSvgWrap{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
+  #dotsSvgWrap svg{ max-width:100%; max-height:100%; }
+  .dot-circle{ cursor:pointer; }
+  .dot-label{ font-family:'Fredoka',sans-serif; font-weight:700; pointer-events:none; }
+
+  /* ================= DRESS UP ================= */
+  #dressStage{ position:relative; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; }
+  #dressCanvas{ position:relative; flex:1 1 auto; min-height:0; width:100%; display:flex; align-items:center; justify-content:center; }
+  #dressBase{ font-size:clamp(90px,20vw,180px); }
+  #dressStickers{ display:flex; gap:14px; flex:0 0 auto; flex-wrap:wrap; justify-content:center; }
+  .sticker{
+    font-size:clamp(28px,6vw,46px);
+    touch-action:none;
+    cursor:grab;
+  }
+  .sticker.placed-on-canvas{ position:absolute; z-index:5; }
+
+  /* ================= SORT (fruits/veg) ================= */
+  #sortStage{ display:flex; flex-direction:column; gap:14px; width:100%; height:100%; align-items:center; justify-content:center; }
+  #sortBaskets{ display:flex; gap:24px; }
+  .basket{
+    width:clamp(90px,16vw,140px); height:clamp(70px,12vw,110px);
+    border-radius:16px 16px 24px 24px;
+    background:rgba(255,255,255,0.5);
+    border:3px dashed rgba(21,54,80,0.35);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    font-size:clamp(11px,2vw,14px);
+    font-weight:700;
+    gap:4px;
+  }
+  .basket .ic{ font-size:clamp(24px,5vw,40px); }
+  #sortTray{ display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
+  .sort-item{
+    font-size:clamp(28px,6vw,46px);
+    touch-action:none;
+    cursor:grab;
+  }
+  .sort-item.gone{ visibility:hidden; }
+
+  footer.credit{ display:none; }
+</style>
+</head>
+<body>
+
+<div id="screenHome" class="screen active">
+  <div id="homeHeader">
+    <h1>🎮 Mini-Jeux</h1>
+    <p>Touche un jeu pour commencer !</p>
+  </div>
+  <div id="gameGrid"></div>
+</div>
+
+<div id="screenGame" class="screen">
+  <div class="topbar">
+    <button class="tb-btn ghost" id="backBtn">← Accueil</button>
+    <span class="tb-title" id="gameTitle">Jeu</span>
+    <div class="topbar-right">
+      <button class="tb-btn icon ghost" id="fullscreenBtn" title="Plein écran">⛶</button>
+      <button class="tb-btn" id="newBtn">🔀 Nouveau</button>
+    </div>
+  </div>
+  <div id="gameArea"></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============================================================
+     SHARED SHELL: navigation, fullscreen, toast, sound, speech
+     ============================================================ */
+
+  const screenHome = document.getElementById('screenHome');
+  const screenGame = document.getElementById('screenGame');
+  const gameGrid = document.getElementById('gameGrid');
+  const gameArea = document.getElementById('gameArea');
+  const gameTitle = document.getElementById('gameTitle');
+  const backBtn = document.getElementById('backBtn');
+  const newBtn = document.getElementById('newBtn');
+  const fullscreenBtn = document.getElementById('fullscreenBtn');
+  const toast = document.getElementById('toast');
+
+  let currentGame = null;
+
+  function showToast(msg, ms){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(()=> toast.classList.remove('show'), ms||1400);
+  }
+
+  // ---- tiny synthesized sound effects (no audio files needed) ----
+  let audioCtx = null;
+  function beep(freq, dur, type){
+    try{
+      if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type||'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + (dur||0.2));
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start(); osc.stop(audioCtx.currentTime + (dur||0.2));
+    }catch(err){ /* ignore */ }
+  }
+  function soundPop(){ beep(520,0.12,'triangle'); }
+  function soundGood(){ beep(660,0.12,'sine'); setTimeout(()=>beep(880,0.18,'sine'),110); }
+  function soundOops(){ beep(180,0.18,'sawtooth'); }
+
+  function warmUpAudio(){
+    try{
+      if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+      if(audioCtx.state === 'suspended') audioCtx.resume();
+    }catch(err){}
+    if('speechSynthesis' in window){
+      try{
+        const u = new SpeechSynthesisUtterance(' ');
+        u.volume = 0;
+        window.speechSynthesis.speak(u);
+      }catch(err){}
+    }
+  }
+
+  function say(text){
+    if(!('speechSynthesis' in window)) return;
+    try{
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'fr-FR';
+      u.rate = 0.95;
+      u.pitch = 1.1;
+      window.speechSynthesis.speak(u);
+    }catch(err){}
+  }
+
+  const BRAVOS = ['Bravo !','Super !','Génial !','Trop bien !','Bien joué !','Youpi !'];
+  function celebrate(){
+    soundGood();
+    const phrase = BRAVOS[Math.floor(Math.random()*BRAVOS.length)];
+    say(phrase);
+    showToast('🎉 ' + phrase, 1200);
+  }
+
+  // ---- fullscreen ----
+  function fsElement(){ return document.fullscreenElement || document.webkitFullscreenElement || null; }
+  function requestFs(el){ const fn = el.requestFullscreen || el.webkitRequestFullscreen; if(fn) return fn.call(el); }
+  function exitFs(){ const fn = document.exitFullscreen || document.webkitExitFullscreen; if(fn) return fn.call(document); }
+  const fsSupported = !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen);
+  if(!fsSupported) fullscreenBtn.classList.add('hidden');
+  function updateFsBtn(){
+    fullscreenBtn.textContent = fsElement() ? '⤢' : '⛶';
+  }
+  fullscreenBtn.addEventListener('click', ()=>{
+    try{ if(fsElement()) exitFs(); else requestFs(document.documentElement); }catch(err){}
+  });
+  document.addEventListener('fullscreenchange', updateFsBtn);
+  document.addEventListener('webkitfullscreenchange', updateFsBtn);
+
+  // ---- navigation ----
+  function openGame(game){
+    currentGame = game;
+    gameTitle.textContent = game.icon + ' ' + game.title;
+    screenHome.classList.remove('active');
+    screenGame.classList.add('active');
+    warmUpAudio();
+    gameArea.innerHTML = '';
+    requestAnimationFrame(()=> game.init(gameArea));
+  }
+  backBtn.addEventListener('click', ()=>{
+    if(fsElement()) exitFs();
+    screenGame.classList.remove('active');
+    screenHome.classList.add('active');
+    currentGame = null;
+    gameArea.innerHTML = '';
+  });
+  newBtn.addEventListener('click', ()=>{
+    if(currentGame){
+      gameArea.innerHTML = '';
+      currentGame.init(gameArea);
+    }
+  });
+
+  function rand(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]]=[a[j],a[i]];
+    }
+    return a;
+  }
+  function pickN(arr, n){ return shuffle(arr).slice(0, n); }
+
+  /* ============================================================
+     Generic drag helper: makes an element draggable (mouse+touch),
+     calling onDrop(x,y) with the pointer's final page coordinates.
+     ============================================================ */
+  function makeSimpleDraggable(el, opts){
+    opts = opts || {};
+    let dragging = false, startParent = null, startNext = null, offsetX=0, offsetY=0;
+
+    function down(clientX, clientY){
+      dragging = true;
+      const rect = el.getBoundingClientRect();
+      offsetX = clientX - rect.left;
+      offsetY = clientY - rect.top;
+      startParent = el.parentElement;
+      startNext = el.nextSibling;
+      el.style.width = rect.width+'px';
+      el.style.height = rect.height+'px';
+      el.style.position = 'fixed';
+      el.style.left = rect.left+'px';
+      el.style.top = rect.top+'px';
+      el.style.zIndex = 999;
+      document.body.appendChild(el);
+      if(opts.onPick) opts.onPick();
+    }
+    function move(clientX, clientY){
+      if(!dragging) return;
+      el.style.left = (clientX-offsetX)+'px';
+      el.style.top = (clientY-offsetY)+'px';
+    }
+    function up(clientX, clientY){
+      if(!dragging) return;
+      dragging = false;
+      const rect = el.getBoundingClientRect();
+      const cx = rect.left+rect.width/2, cy = rect.top+rect.height/2;
+      const handled = opts.onDrop ? opts.onDrop(cx, cy, el) : false;
+      if(!handled){
+        el.style.position = 'static';
+        el.style.left = ''; el.style.top = ''; el.style.width=''; el.style.height=''; el.style.zIndex='';
+        if(startNext) startParent.insertBefore(el, startNext); else startParent.appendChild(el);
+      }
+    }
+    el.addEventListener('mousedown', (e)=>{ down(e.clientX,e.clientY); e.preventDefault(); });
+    el.addEventListener('touchstart', (e)=>{ const t=e.touches[0]; down(t.clientX,t.clientY); if(e.cancelable) e.preventDefault(); }, {passive:false});
+    window.addEventListener('mousemove', (e)=> move(e.clientX,e.clientY));
+    window.addEventListener('touchmove', (e)=>{ const t=e.touches[0]; move(t.clientX,t.clientY); if(e.cancelable) e.preventDefault(); }, {passive:false});
+    window.addEventListener('mouseup', (e)=> up(e.clientX,e.clientY));
+    window.addEventListener('touchend', (e)=>{ const t=e.changedTouches[0]; up(t.clientX,t.clientY); });
+    window.addEventListener('touchcancel', (e)=>{ const t=e.changedTouches[0]; up(t.clientX,t.clientY); });
+  }
+
+  /* ============================================================
+     CONTENT SETS (emoji-based, no external assets, no copyright)
+     ============================================================ */
+  const SETS = {
+    animaux: ['🐶','🐱','🐭','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐷','🐸'],
+    ferme:   ['🐄','🐷','🐑','🐔','🐴','🐐','🐓','🦆','🐇','🐕'],
+    jungle:  ['🦁','🐯','🐵','🐘','🦒','🦓','🐍','🦜','🐊','🦍'],
+    ocean:   ['🐳','🐬','🐠','🐡','🦀','🐙','🦑','🦈','🐢','🦞'],
+    fruits:  ['🍎','🍌','🍇','🍓','🍊','🍉','🍍','🍑','🍒','🥝','🍋','🍐'],
+    legumes: ['🥕','🥦','🌽','🍅','🥔','🥒','🍆','🫑','🧅','🥬'],
+    vehicules: ['🚗','🚕','🚌','🚓','🚑','🚒','🚜','✈️','🚀','⛵','🚲','🚂'],
+    jouets:  ['🧸','🎈','🪀','🪁','🎲','🧩','🪅','🎯']
+  };
+
+  const COLORS = [
+    {name:'rouge', hex:'#E5473B'},
+    {name:'bleu', hex:'#3B7DE5'},
+    {name:'jaune', hex:'#F2C230'},
+    {name:'vert', hex:'#3EA35C'},
+    {name:'orange', hex:'#F0872E'},
+    {name:'violet', hex:'#8B5FBF'},
+    {name:'rose', hex:'#EE6FA6'}
+  ];
+
+  /* ============================================================
+     GAME 1 — MEMORY (several themes, adjustable pair count)
+     ============================================================ */
+  const gameMemory = {
+    id:'memory', icon:'🧠', title:'Mémo', color:'#4C93C7', desc:'Retrouve les paires',
+    init(root){
+      const wrap = document.createElement('div');
+      wrap.className = 'game-root';
+      const instr = document.createElement('div');
+      instr.className = 'game-instructions';
+      instr.textContent = 'Retourne deux cartes pour trouver les paires !';
+      const stage = document.createElement('div');
+      stage.className = 'game-stage';
+      const grid = document.createElement('div');
+      grid.id = 'memGrid';
+      stage.appendChild(grid);
+      wrap.appendChild(instr); wrap.appendChild(stage);
+      root.appendChild(wrap);
+
+      const themeKey = rand(['animaux','ferme','jungle','ocean','fruits','vehicules','jouets']);
+      const pairCount = rand([4,5,6,6,8]);
+      const chosen = pickN(SETS[themeKey], pairCount);
+      let cards = shuffle(chosen.concat(chosen)).map((emoji,i)=>({emoji, id:i}));
+
+      let cols = cards.length <= 8 ? 4 : (cards.length <= 12 ? 4 : 5);
+      let rows = Math.ceil(cards.length/cols);
+      grid.style.gridTemplateColumns = `repeat(${cols},1fr)`;
+      grid.style.gridTemplateRows = `repeat(${rows},1fr)`;
+
+      let first = null, second = null, lock = false, matchedCount = 0;
+
+      cards.forEach(card=>{
+        const el = document.createElement('div');
+        el.className = 'mem-card';
+        el.innerHTML = `<div class="face face-front">❓</div><div class="face face-back">${card.emoji}</div>`;
+        el.addEventListener('click', ()=>{
+          if(lock || el.classList.contains('flipped') || el.classList.contains('matched')) return;
+          el.classList.add('flipped');
+          soundPop();
+          if(!first){ first = {el, card}; return; }
+          second = {el, card};
+          lock = true;
+          if(first.card.emoji === second.card.emoji){
+            first.el.classList.add('matched');
+            second.el.classList.add('matched');
+            matchedCount += 2;
+            first=null; second=null; lock=false;
+            if(matchedCount === cards.length){ setTimeout(celebrate, 200); }
+          } else {
+            setTimeout(()=>{
+              first.el.classList.remove('flipped');
+              second.el.classList.remove('flipped');
+              first=null; second=null; lock=false;
+            }, 700);
+          }
+        });
+        grid.appendChild(el);
+      });
+    }
+  };
+
+  /* ============================================================
+     GAME 2 — SHAPE SORTER
+     ============================================================ */
+  const SHAPES = ['circle','square','triangle','diamond','hexagon','star'];
+  const SHAPE_COLORS = ['#E5473B','#3B7DE5','#F2C230','#3EA35C','#F0872E','#8B5FBF'];
+
+  const gameShapes = {
+    id:'shapes', icon:'🔷', title:'Formes', color:'#8B5FBF', desc:'Range les formes',
+    init(root){
+      const wrap = document.createElement('div');
+      wrap.className = 'game-root';
+      const instr = document.createElement('div');
+      instr.className = 'game-instructions';
+      instr.textContent = 'Glisse chaque forme dans la bonne case !';
+      const stage = document.createElement('div');
+      stage.id = 'shapeStage';
+      const slotsRow = document.createElement('div');
+      slotsRow.id = 'shapeSlots';
+      const tray = document.createElement('div');
+      tray.id = 'shapeTray';
+      stage.appendChild(slotsRow); stage.appendChild(tray);
+      wrap.appendChild(instr); wrap.appendChild(stage);
+      root.appendChild(wrap);
+
+      const n = rand([3,4,4,5]);
+      const chosenShapes = pickN(SHAPES, n);
+      const order = shuffle(chosenShapes);
+
+      let placedCount = 0;
+
+      chosenShapes.forEach((shape)=>{
+        const slot = document.createElement('div');
+        slot.className = 'shape-slot';
+        slot.dataset.shape = shape;
+        slotsRow.appendChild(slot);
+      });
+
+      order.forEach((shape, idx)=>{
+        const piece = document.createElement('div');
+        piece.className = 'shape-piece shp shp-'+shape;
+        piece.style.background = SHAPE_COLORS[SHAPES.indexOf(shape)];
+        piece.dataset.shape = shape;
+        tray.appendChild(piece);
+
+        makeSimpleDraggable(piece, {
+          onDrop(cx, cy){
+            const slots = Array.from(slotsRow.querySelectorAll('.shape-slot'));
+            for(const slot of slots){
+              if(slot.dataset.filled) continue;
+              const r = slot.getBoundingClientRect();
+              if(cx>=r.left && cx<=r.right && cy>=r.top && cy<=r.bottom){
+                if(slot.dataset.shape === shape){
+                  const sr = slot.getBoundingClientRect();
+                  piece.style.position='fixed';
+                  piece.style.left=sr.left+'px';
+                  piece.style.top=sr.top+'px';
+                  piece.style.width=sr.width+'px';
+                  piece.style.height=sr.height+'px';
+                  piece.style.zIndex=1;
+                  slot.dataset.filled = '1';
+                  placedCount++;
+                  soundPop();
+                  if(placedCount === chosenShapes.length) setTimeout(celebrate, 150);
+                  return true;
+                } else {
+                  soundOops();
+                  return false;
+                }
+              }
+            }
+            return false;
+          }
+        });
+      });
+    }
+  };
+
+  /* ============================================================
+     GAME 3 — BUBBLES
+     ============================================================ */
+  const gameBubbles = {
+    id:'bubbles', icon:'🎈', title:'Bulles', color:'#3EA35C', desc:'Fais éclater les bulles',
+    init(root){
+      const wrap = document.createElement('div');
+      wrap.className = 'game-root';
+      const instr = document.createElement('div');
+      instr.className = 'game-instructions';
+      instr.textContent = 'Touche les bulles pour les faire éclater !';
+      const stage = document.createElement('div');
+      stage.className = 'game-stage';
+      const bubbleStage = document.createElement('div');
+      bubbleStage.id = 'bubbleStage';
+      stage.appendChild(bubbleStage);
+      wrap.appendChild(instr); wrap.appendChild(stage);
+      root.appendChild(wrap);
+
+      const themeKey = rand(['animaux','fruits','jouets','ferme','ocean']);
+      const items = SETS[themeKey];
+
+      function spawnBubble(){
+        if(!bubbleStage.isConnected) return;
+        const rect = bubbleStage.getBoundingClientRect();
+        if(rect.width < 20 || rect.height < 20) return;
+        const size = 46 + Math.random()*40;
+        const b = document.createElement('div');
+        b.className = 'bubble';
+        b.textContent = rand(items);
+        b.style.width = size+'px';
+        b.style.height = size+'px';
+        b.style.left = (Math.random()*(rect.width-size))+'px';
+        b.style.top = (Math.random()*(rect.height-size))+'px';
+        b.addEventListener('click', ()=>{
+          if(b.classList.contains('pop')) return;
+          b.classList.add('pop');
+          soundPop();
+          setTimeout(()=> b.remove(), 180);
+        });
+        bubbleStage.appendChild(b);
+        setTimeout(()=>{ if(b.isConnected && !b.classList.contains('pop')) b.remove(); }, 6000);
+      }
+
+      for(let i=0;i<7;i++) setTimeout(spawnBubble, i*150);
+      const interval = setInterval(spawnBubble, 900);
+      gameArea._cleanup = ()=> clearInterval(interval);
+      // stop spawning if this game is left
+      const obs = new MutationObserver(()=>{
+        if(!bubbleStage.isConnected){ clearInterval(interval); obs.disconnect(); }
+      });
+      obs.observe(document.getElementById('gameArea'), {childList:true, subtree:true});
+    }
+  };
+
+  /* ============================================================
+     GAME 4 — COUNT & TAP
+     ============================================================ */
+  const gameCount = {
+    id:'count', icon:'🔢', title:'Compte', color:'#F0872E', desc:'Compte et touche le bon nombre',
+    init(root){
+      const wrap = document.createElement('div');
+      wrap.className = 'game-root';
+      const instr = document.createElement('div');
+      instr.className = 'game-instructions';
+      instr.textContent = 'Combien y en a-t-il ? Touche le bon chiffre !';
+      const stage = document.createElement('div');
+      stage.className = 'game-stage';
+      stage.style.flexDirection = 'column';
+      stage.style.gap = '24px';
+      const row = document.createElement('div');
+      row.id = 'countRow';
+      const choices = document.createElement('div');
+      choices.id = 'countChoices';
+      stage.appendChild(row); stage.appendChild(choices);
+      wrap.appendChild(instr); wrap.appendChild(stage);
+      root.appendChild(wrap);
+
+      const themeKey = rand(Object.keys(SETS));
+      const emoji = rand(SETS[themeKey]);
+      const correct = 1 + Math.floor(Math.random()*5);
+      for(let i=0;i<correct;i++){
+        const s = document.createElement('span');
+        s.textContent = emoji;
+        row.appendChild(s);
+      }
+      let distractors = shuffle([1,2,3,4,5].filter(n=>n!==correct)).slice(0,2);
+      const options = shuffle([correct, ...distractors]);
+      let answered = false;
+      options.forEach(n=>{
+        const btn = document.createElement('button');
+        btn.className = 'count-btn';
+        btn.textContent = n;
+        btn.addEventListener('click', ()=>{
+          if(answered) return;
+          if(n === correct){
+            answered = true;
+            btn.style.boxShadow = '0 0 0 4px var(--teal), 0 5px 0 var(--coral-dark)';
+            celebrate();
+            setTimeout(()=>{ gameArea.innerHTML=''; gameCount.init(gameArea); }, 900);
+          } else {
+            soundOops();
+            btn.style.opacity = '0.4';
+          }
+        });
+        choices.appendChild(btn);
+      });
+    }
+  };
+
+  /* ============================================================
+     GAME 5 — COLORING
+     ============================================================ */
+  const COLORING_TEMPLATES = [
+    { name:'Soleil', build(svg){
+        addPath(svg,'M150,60 L165,20 L175,62 Z','r1');
+        addPath(svg,'M150,60 L195,35 L182,72 Z','r2');
+        addPath(svg,'M150,60 L225,60 L188,80 Z','r3');
+        addPath(svg,'M150,60 L195,85 L182,72 Z','r4');
+        addPath(svg,'M150,60 L165,100 L175,62 Z','r5');
+        addPath(svg,'M150,60 L135,100 L125,62 Z','r6');
+        addPath(svg,'M150,60 L105,85 L118,72 Z','r7');
+        addPath(svg,'M150,60 L75,60 L112,80 Z','r8');
+        addPath(svg,'M150,60 L105,35 L118,72 Z','r9');
+        addPath(svg,'M150,60 L135,20 L125,62 Z','r10');
+        addCircle(svg,150,60,32,'center');
+      }
+    },
+    { name:'Fleur', build(svg){
+        addEllipse(svg,150,50,26,18,'p1');
+        addEllipse(svg,190,80,26,18,'p2',45);
+        addEllipse(svg,178,125,26,18,'p3',110);
+        addEllipse(svg,122,125,26,18,'p4',-110);
+        addEllipse(svg,110,80,26,18,'p5',-45);
+        addCircle(svg,150,90,20,'center');
+        addRect(svg,145,150,10,60,'stem');
+      }
+    },
+    { name:'Poisson', build(svg){
+        addEllipse(svg,130,90,70,40,'body');
+        addPath(svg,'M195,90 L240,60 L240,120 Z','tail');
+        addCircle(svg,90,80,8,'eye');
+      }
+    },
+    { name:'Maison', build(svg){
+        addRect(svg,80,110,140,90,'wall');
+        addPath(svg,'M70,110 L150,40 L230,110 Z','roof');
+        addRect(svg,135,150,30,50,'door');
+        addRect(svg,95,125,30,30,'win1');
+        addRect(svg,175,125,30,30,'win2');
+      }
+    }
+  ];
+  function addPath(svg,d,id){ const p=document.createElementNS('http://www.w3.org/2000/svg','path'); p.setAttribute('d',d); p.setAttribute('fill','#ffffff'); p.dataset.region=id; svg.appendChild(p); }
+  function addCircle(svg,cx,cy,r,id){ const p=document.createElementNS('http://www.w3.org/2000/svg','circle'); p.setAttribute('cx',cx); p.setAttribute('cy',cy); p.setAttribute('r',r); p.setAttribute('fill','#ffffff'); p.dataset.region=id; svg.appendChild(p); }
+  function addEllipse(svg,cx,cy,rx,ry,id,rot){ const p=document.createElementNS('http://www.w3.org/2000/svg','ellipse'); p.setAttribute('cx',cx); p.setAttribute('cy',cy); p.setAttribute('rx',rx); p.setAttribute('ry',ry); p.setAttribute('fill','#ffffff'); if(rot) p.setAttribute('transform',`rotate(${rot} ${cx} ${cy})`); p.dataset.region=id; svg.appendChild(p); }
+  function addRect(svg,x,y,w,h,id){ const p=document.createElementNS('http://www.w3.org/2000/svg','rect'); p.setAttribute('x',x); p.setAttribute('y',y); p.setAttribute('width',w); p.setAttribute('height',h); p.setAttribute('fill','#ffffff'); p.dataset.region=id; svg.appendChild(p); }
+
+  const gameColoring = {
+    id:'coloring', icon:'🎨', title:'Coloriage', color:'#EE6FA6', desc:'Colorie le dessin',
+    init(root){
+      const wrap = document.createElement('div');
+      wrap.className = 'game-root';
+      const instr = document.createElement('div');
+      instr.className = 'game-instructions';
+      instr.textContent = 'Choisis une couleur, puis touche le dessin !';
+      const stage = document.createElement('div');
+      stage.id = 'colorStage';
+      const svgWrap = document.createElement('div');
+      svgWrap.id = 'colorSvgWrap';
+      const palette = document.createElement('div');
+      palette.id = 'palette';
+      stage.appendChild(svgWrap); stage.appendChild(palette);
+      wrap.appendChild(instr); wrap.appendChild(stage);
+      root.appendChild(wrap);
+
+      const tpl = rand(COLORING_TEMPLATES);
+      const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+      svg.setAttribute('viewBox','0 0 300 220');
+      svg.setAttribute('width','420');
+      svg.setAttribute('height','300');
+      tpl.build(svg);
+      svgWrap.appendChild(svg);
+
+      let selected = COLORS[0].hex;
+      COLORS.forEach((c,i)=>{
+        const sw = document.createElement('div');
+        sw.className = 'swatch' + (i===0?' selected':'');
+        sw.style.background = c.hex;
+        sw.addEventListener('click', ()=>{
+          selected = c.hex;
+          palette.querySelectorAll('.swatch').forEach(s=>s.classList.remove('selected'));
+          sw.classList.add('selected');
+        });
+        palette.appendChild(sw);
+      });
+
+      svg.querySelectorAll('[data-region]').forEach(region=>{
+        region.addEventListener('click', ()=>{
+          region.setAttribute('fill', selected);
+          soundPop();
+        });
+      });
+    }
+  };
+
+  /* ============================================================
+     GAME 6 — ANIMAL SOUNDS (says the animal's name aloud)
+     ============================================================ */
+  const gameAnimals = {
+    id:'animals', icon:'🐮', title:'Qui est-ce ?', color:'#F2C230', desc:'Touche et écoute',
+    init(root){
+      const wrap = document.createElement('div');
+      wrap.className = 'game-root';
+      const instr = document.createElement('div');
+      instr.className = 'game-instructions';
+      instr.textContent = 'Touche un animal pour l\'entendre !';
+      const stage = document.createElement('div');
+      stage.className = 'game-stage';
+      const grid = document.createElement('div');
+      grid.id = 'animalGrid';
+      stage.appendChild(grid);
+      wrap.appendChild(instr); wrap.appendChild(stage);
+      root.appendChild(wrap);
+
+      const NAMES = {
+        '🐶':'Le chien','🐱':'Le chat','🐭':'La souris','🐰':'Le lapin','🦊':'Le renard',
+        '🐻':'L\'ours','🐼':'Le panda','🐨':'Le koala','🐯':'Le tigre','🦁':'Le lion',
+        '🐷':'Le cochon','🐸':'La grenouille','🐄':'La vache','🐑':'Le mouton','🐔':'La poule',
+        '🐴':'Le cheval','🐐':'La chèvre','🦆':'Le canard','🐘':'L\'éléphant','🦒':'La girafe',
+        '🦓':'Le zèbre','🐍':'Le serpent','🦜':'Le perroquet','🐊':'Le crocodile','🦍':'Le gorille',
+        '🐳':'La baleine','🐬':'Le dauphin','🐠':'Le poisson','🐡':'Le poisson-globe','🦀':'Le crabe',
+        '🐙':'La pieuvre','🦑':'Le calamar','🦈':'Le requin','🐢':'La tortue','🦞':'Le homard',
+        '🐕':'Le chien'
+      };
+
+      const themeKey = rand(['ferme','jungle','ocean','animaux']);
+      const chosen = pickN(SETS[themeKey], Math.min(6, SETS[themeKey].length));
+      const cols = chosen.length <= 4 ? 2 : 3;
+      grid.style.gridTemplateColumns = `repeat(${cols},1fr)`;
+      grid.style.gridTemplateRows = `repeat(${Math.ceil(chosen.length/cols)},1fr)`;
+
+      chosen.forEach(emoji=>{
+        const btn = document.createElement('div');
+        btn.className = 'animal-btn';
+        btn.textContent = emoji;
+        btn.addEventListener('click', ()=>{
+          btn.classList.remove('bounce');
+          void btn.offsetWidth;
+          btn.classList.add('bounce');
+          say(NAMES[emoji] || 'L\'animal');
+        });
+        grid.appendChild(btn);
+      });
+    }
+  };
+
+  /* ============================================================
+     GAME 7 — COLOR HUNT
+     ============================================================ */
+  const COLOR_EMOJI = {
+    rouge:['🍎','🍓','🚗','❤️','🌹'],
+    bleu:['🔵','🐳','🚙','💧','👖'],
+    jaune:['🍌','⭐','🌻','🐥','🍋'],
+    vert:['🥦','🐸','🍏','🌳','🥝'],
+    orange:['🍊','🥕','🦊','🎃',"🧡"],
+    violet:['🍆','🔮','🍇','👾','💜'],
+    rose:['🌸','🎀','🐷','🍥','💗']
+  };
+  const gameColorHunt = {
+    id:'colorhunt', icon:'🌈', title:'Couleurs', color:'#3B7DE5', desc:'Trouve la bonne couleur',
+    init(root){
+      const wrap = document.createElement('div');
+      wrap.className = 'game-root';
+      const instr = document.createElement('div');
+      instr.className = 'game-instructions';
+      instr.id = 'chInstr';
+      const stage = document.createElement('div');
+      stage.className = 'game-stage';
+      stage.style.flexDirection = 'column';
+      stage.style.gap = '24px';
+      const target = document.createElement('div');
+      target.id = 'colorHuntTarget';
+      const opts = document.createElement('div');
+      opts.id = 'colorHuntOptions';
+      stage.appendChild(target); stage.appendChild(opts);
+      wrap.appendChild(instr); wrap.appendChild(stage);
+      root.appendChild(wrap);
+
+      const colorObj = rand(COLORS);
+      instr.textContent = `Touche quelque chose de couleur ${colorObj.name} !`;
+      const dot = document.createElement('div');
+      dot.className = 'shp shp-circle';
+      dot.style.width = 'clamp(60px,14vw,110px)';
+      dot.style.height = 'clamp(60px,14vw,110px)';
+      dot.style.background = colorObj.hex;
+      dot.style.boxShadow = '0 6px 0 rgba(0,0,0,0.2)';
+      target.appendChild(dot);
+
+      const correctEmoji = rand(COLOR_EMOJI[colorObj.name]);
+      const otherColors = COLORS.filter(c=>c.name!==colorObj.name);
+      const distractEmojis = shuffle(otherColors).slice(0,3).map(c=> rand(COLOR_EMOJI[c.name]));
+      const options = shuffle([correctEmoji, ...distractEmojis]);
+      let answered = false;
+      options.forEach(em=>{
+        const btn = document.createElement('div');
+        btn.className = 'ch-opt';
+        btn.textContent = em;
+        btn.addEventListener('click', ()=>{
+          if(answered) return;
+          if(em === correctEmoji){
+            answered = true;
+            celebrate();
+            setTimeout(()=>{ gameArea.innerHTML=''; gameColorHunt.init(gameArea); }, 900);
+          } else {
+            soundOops();
+            btn.style.opacity = '0.35';
+          }
+        });
+        opts.appendChild(btn);
+      });
+    }
+  };
+
+  /* ============================================================
+     GAME 8 — SHADOW MATCHING
+     ============================================================ */
+  const gameShadows = {
+    id:'shadows', icon:'🌑', title:'Ombres', color:'#153650', desc:'Trouve la bonne ombre',
+    init(root){
+      const wrap = document.createElement('div');
+      wrap.className = 'game-root';
+      const instr = document.createElement('div');
+      instr.className = 'game-instructions';
+      instr.textContent = 'Quelle ombre correspond à l\'image ?';
+      const stage = document.createElement('div');
+      stage.className = 'game-stage';
+      stage.style.flexDirection = 'column';
+      stage.style.gap = '26px';
+      const targetWrap = document.createElement('div');
+      targetWrap.id = 'shadowTargetWrap';
+      const opts = document.createElement('div');
+      opts.id = 'shadowOptions';
+      stage.appendChild(targetWrap); stage.appendChild(opts);
+      wrap.appendChild(instr); wrap.appendChild(stage);
+      root.appendChild(wrap);
+
+      const themeKey = rand(['animaux','fruits','vehicules','jungle']);
+      const chosen = pickN(SETS[themeKey], 3);
+      const correct = chosen[0];
+      targetWrap.textContent = correct;
+
+      const options = shuffle(chosen);
+      let answered = false;
+      options.forEach(em=>{
+        const w = document.createElement('div');
+        w.className = 'shadow-opt-wrap';
+        const s = document.createElement('div');
+        s.className = 'shadow-opt';
+        s.textContent = em;
+        w.appendChild(s);
+        w.addEventListener('click', ()=>{
+          if(answered) return;
+          if(em === correct){
+            answered = true;
+            s.style.filter = 'none';
+            celebrate();
+            setTimeout(()=>{ gameArea.innerHTML=''; gameShadows.init(gameArea); }, 900);
+          } else {
+            soundOops();
+            w.style.opacity = '0.35';
+          }
+        });
+        opts.appendChild(w);
+      });
+    }
+  };
+
+  /* ============================================================
+     GAME 9 — CONNECT THE DOTS
+     ============================================================ */
+  const DOT_SHAPES = [
+    { name:'Maison', points:[[150,20],[260,90],[220,90],[220,190],[80,190],[80,90],[40,90]] },
+    { name:'Étoile', points:[[150,10],[180,95],[270,95],[196,148],[224,232],[150,182],[76,232],[104,148],[30,95],[120,95]] },
+    { name:'Fusée', points:[[150,10],[180,90],[180,180],[150,220],[120,180],[120,90]] },
+    { name:'Poisson', points:[[40,120],[110,70],[200,80],[260,50],[230,120],[260,190],[200,160],[110,170]] }
+  ];
+  const gameDots = {
+    id:'dots', icon:'⭐', title:'Relie les points', color:'#F4B93E', desc:'Suis les numéros',
+    init(root){
+      const wrap = document.createElement('div');
+      wrap.className = 'game-root';
+      const instr = document.createElement('div');
+      instr.className = 'game-instructions';
+      instr.textContent = 'Touche les points dans l\'ordre : 1, 2, 3...';
+      const stage = document.createElement('div');
+      stage.id = 'dotsSvgWrap';
+      wrap.appendChild(instr); wrap.appendChild(stage);
+      root.appendChild(wrap);
+
+      const shape = rand(DOT_SHAPES);
+      const svgNS = 'http://www.w3.org/2000/svg';
+      const svg = document.createElementNS(svgNS,'svg');
+      svg.setAttribute('viewBox','0 0 300 250');
+      svg.setAttribute('width','420'); svg.setAttribute('height','360');
+      stage.appendChild(svg);
+
+      const pathEl = document.createElementNS(svgNS,'path');
+      pathEl.setAttribute('fill','none');
+      pathEl.setAttribute('stroke', '#2C8C7E');
+      pathEl.setAttribute('stroke-width','4');
+      pathEl.setAttribute('stroke-linecap','round');
+      svg.appendChild(pathEl);
+
+      let next = 0;
+      let d = '';
+
+      shape.points.forEach((pt, i)=>{
+        const c = document.createElementNS(svgNS,'circle');
+        c.setAttribute('cx', pt[0]); c.setAttribute('cy', pt[1]); c.setAttribute('r', 12);
+        c.setAttribute('fill', i===0 ? '#F0562E' : '#F4FAFF');
+        c.setAttribute('stroke', '#153650'); c.setAttribute('stroke-width','2');
+        c.classList.add('dot-circle');
+        svg.appendChild(c);
+
+        const t = document.createElementNS(svgNS,'text');
+        t.setAttribute('x', pt[0]); t.setAttribute('y', pt[1]+4);
+        t.setAttribute('text-anchor','middle');
+        t.setAttribute('font-size','11');
+        t.setAttribute('fill', i===0 ? '#fff' : '#153650');
+        t.classList.add('dot-label');
+        t.textContent = i+1;
+        svg.appendChild(t);
+
+        c.addEventListener('click', ()=>{
+          if(i !== next) { soundOops(); return; }
+          d += (i===0 ? `M${pt[0]},${pt[1]}` : ` L${pt[0]},${pt[1]}`);
+          pathEl.setAttribute('d', d);
+          c.setAttribute('fill', '#2C8C7E');
+          soundPop();
+          next++;
+          if(next === shape.points.length){
+            d += ' Z';
+            pathEl.setAttribute('d', d);
+            setTimeout(celebrate, 150);
+          }
+        });
+      });
+    }
+  };
+
+  /* ============================================================
+     GAME 10 — DRESS UP (creative, no wrong answer)
+     ============================================================ */
+  const DRESS_BASES = ['😀','🐶','🐱','🐻','🧸'];
+  const STICKERS = ['🎩','👓','🎀','🌸','👑','🦋','⭐','❤️','🎈'];
+  const gameDress = {
+    id:'dress', icon:'🎩', title:'Décore-moi', color:'#EE6FA6', desc:'Amuse-toi à décorer',
+    init(root){
+      const wrap = document.createElement('div');
+      wrap.className = 'game-root';
+      const instr = document.createElement('div');
+      instr.className = 'game-instructions';
+      instr.textContent = 'Glisse les objets pour décorer le personnage !';
+      const stage = document.createElement('div');
+      stage.id = 'dressStage';
+      const canvas = document.createElement('div');
+      canvas.id = 'dressCanvas';
+      const base = document.createElement('div');
+      base.id = 'dressBase';
+      base.textContent = rand(DRESS_BASES);
+      canvas.appendChild(base);
+      const stickerRow = document.createElement('div');
+      stickerRow.id = 'dressStickers';
+      stage.appendChild(canvas); stage.appendChild(stickerRow);
+      wrap.appendChild(instr); wrap.appendChild(stage);
+      root.appendChild(wrap);
+
+      const chosen = pickN(STICKERS, 6);
+      chosen.forEach(em=>{
+        const s = document.createElement('div');
+        s.className = 'sticker';
+        s.textContent = em;
+        stickerRow.appendChild(s);
+        makeSimpleDraggable(s, {
+          onDrop(cx, cy){
+            const r = canvas.getBoundingClientRect();
+            if(cx>=r.left && cx<=r.right && cy>=r.top && cy<=r.bottom){
+              s.style.position = 'absolute';
+              s.style.left = (cx-r.left-20)+'px';
+              s.style.top = (cy-r.top-20)+'px';
+              s.style.width=''; s.style.height='';
+              s.classList.add('placed-on-canvas');
+              canvas.appendChild(s);
+              soundPop();
+              return true;
+            }
+            return false;
+          }
+        });
+      });
+    }
+  };
+
+  /* ============================================================
+     GAME 11 — SORT (fruits vs vegetables)
+     ============================================================ */
+  const gameSort = {
+    id:'sort', icon:'🧺', title:'Range-les', color:'#3EA35C', desc:'Trie fruits et légumes',
+    init(root){
+      const wrap = document.createElement('div');
+      wrap.className = 'game-root';
+      const instr = document.createElement('div');
+      instr.className = 'game-instructions';
+      instr.textContent = 'Glisse chaque aliment dans le bon panier !';
+      const stage = document.createElement('div');
+      stage.id = 'sortStage';
+      const baskets = document.createElement('div');
+      baskets.id = 'sortBaskets';
+      const bFruit = document.createElement('div');
+      bFruit.className = 'basket'; bFruit.dataset.kind='fruits';
+      bFruit.innerHTML = '<span class="ic">🧺</span><span>Fruits</span>';
+      const bVeg = document.createElement('div');
+      bVeg.className = 'basket'; bVeg.dataset.kind='legumes';
+      bVeg.innerHTML = '<span class="ic">🧺</span><span>Légumes</span>';
+      baskets.appendChild(bFruit); baskets.appendChild(bVeg);
+      const tray = document.createElement('div');
+      tray.id = 'sortTray';
+      stage.appendChild(baskets); stage.appendChild(tray);
+      wrap.appendChild(instr); wrap.appendChild(stage);
+      root.appendChild(wrap);
+
+      const items = shuffle([
+        ...pickN(SETS.fruits, 4).map(e=>({e, kind:'fruits'})),
+        ...pickN(SETS.legumes, 4).map(e=>({e, kind:'legumes'}))
+      ]);
+
+      let remaining = items.length;
+
+      items.forEach(item=>{
+        const el = document.createElement('div');
+        el.className = 'sort-item';
+        el.textContent = item.e;
+        tray.appendChild(el);
+        makeSimpleDraggable(el, {
+          onDrop(cx, cy){
+            const bRect1 = bFruit.getBoundingClientRect();
+            const bRect2 = bVeg.getBoundingClientRect();
+            let targetKind = null;
+            if(cx>=bRect1.left && cx<=bRect1.right && cy>=bRect1.top && cy<=bRect1.bottom) targetKind='fruits';
+            if(cx>=bRect2.left && cx<=bRect2.right && cy>=bRect2.top && cy<=bRect2.bottom) targetKind='legumes';
+            if(!targetKind) return false;
+            if(targetKind === item.kind){
+              el.classList.add('gone');
+              soundPop();
+              remaining--;
+              if(remaining===0) setTimeout(celebrate, 150);
+              return true;
+            } else {
+              soundOops();
+              return false;
+            }
+          }
+        });
+      });
+    }
+  };
+
+  /* ============================================================
+     REGISTER GAMES + BUILD HOME GRID
+     ============================================================ */
+  const GAMES = [
+    gameMemory, gameShapes, gameBubbles, gameCount, gameColoring,
+    gameAnimals, gameColorHunt, gameShadows, gameDots, gameDress, gameSort
+  ];
+
+  GAMES.forEach(game=>{
+    const card = document.createElement('button');
+    card.className = 'game-card';
+    card.style.background = `linear-gradient(155deg, ${game.color}, #153650)`;
+    card.innerHTML = `<span class="ic">${game.icon}</span><span>${game.title}</span>`;
+    card.addEventListener('click', ()=> openGame(game));
+    gameGrid.appendChild(card);
+  });
+
+})();
+</script>
+
+</body>
+</html>
