@@ -350,16 +350,27 @@
   .animal-btn.placed-correct-anim{ box-shadow:0 0 0 4px var(--teal), 0 5px 0 rgba(21,54,80,0.25); }
 
   #findStage{ display:flex; flex-direction:column; gap:16px; width:100%; height:100%; align-items:center; justify-content:center; }
-  #findPlayRow{ flex:0 0 auto; display:flex; align-items:center; gap:16px; }
+  #findPlayRow{ flex:0 0 auto; display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap; }
   #findPlayBtn{
-    width:clamp(70px,15vmin,110px); height:clamp(70px,15vmin,110px);
-    border-radius:50%;
+    padding:20px 34px;
+    border-radius:22px;
     background:var(--coral);
     color:white;
-    font-size:clamp(28px,7vmin,46px);
-    box-shadow:0 6px 0 var(--coral-dark);
+    font-family:'Fredoka',sans-serif;
+    font-weight:700;
+    font-size:clamp(20px,5vmin,32px);
+    box-shadow:0 7px 0 var(--coral-dark);
   }
-  #findPlayBtn:active{ transform:translateY(4px); box-shadow:0 1px 0 var(--coral-dark); }
+  #findPlayBtn:active{ transform:translateY(5px); box-shadow:0 2px 0 var(--coral-dark); }
+  #findNewRoundBtn{
+    padding:14px 18px;
+    border-radius:16px;
+    background:var(--teal);
+    color:white;
+    font-size:clamp(18px,4vmin,26px);
+    box-shadow:0 5px 0 var(--teal-dark);
+  }
+  #findNewRoundBtn:active{ transform:translateY(4px); box-shadow:0 1px 0 var(--teal-dark); }
   #findTargetLabel{
     font-family:'Fredoka',sans-serif;
     font-weight:700;
@@ -401,45 +412,65 @@
   }
   .shadow-opt-wrap:active{ transform:translateY(4px); box-shadow:0 1px 0 rgba(21,54,80,0.25); }
 
-  /* ================= CONNECT DOTS ================= */
-  #matchStage{
-    position:relative;
-    width:100%; height:100%;
-    max-width:600px;
+  /* ================= PAIRS (mixed grid + found panel) ================= */
+  #pairStage{
     display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:10%;
-  }
-  #matchLines{ position:absolute; top:0; left:0; pointer-events:none; z-index:0; }
-  .match-col{
-    position:relative; z-index:1;
-    display:flex; flex-direction:column;
     gap:14px;
-    flex:1;
+    width:100%; height:100%;
+    align-items:stretch;
+  }
+  #pairFound{
+    flex:0 0 auto;
+    width:clamp(70px,14vmin,110px);
+    max-height:100%;
+    overflow:hidden;
+    background:rgba(255,255,255,0.5);
+    border:3px dashed rgba(21,54,80,0.3);
+    border-radius:14px;
+    padding:8px 6px;
+    display:flex;
+    flex-direction:column;
     align-items:center;
+    gap:8px;
   }
-  .match-btn{
-    width:clamp(78px,16vmin,124px); height:clamp(78px,16vmin,124px);
-    border-radius:20px;
+  .pair-found-label{
+    font-weight:700;
+    font-size:11px;
+    color:var(--wood-2);
+    text-align:center;
+  }
+  .pair-found-item{
+    font-size:clamp(20px,4.5vmin,32px);
+    opacity:0.85;
+  }
+  #pairGrid{
+    flex:1 1 auto;
+    min-width:0;
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-content:center;
+    justify-content:center;
+  }
+  .pair-tile{
+    border-radius:16px;
     background:var(--panel);
-    box-shadow:0 6px 0 rgba(21,54,80,0.25);
+    box-shadow:0 5px 0 rgba(21,54,80,0.25);
     display:flex; align-items:center; justify-content:center;
-    font-size:clamp(36px,10vmin,66px);
     cursor:pointer;
+    flex:0 0 auto;
   }
-  .match-btn:active{ transform:translateY(3px); }
-  .match-btn.selected{ box-shadow:0 0 0 4px var(--coral), 0 5px 0 rgba(21,54,80,0.25); }
-  .match-btn.matched{ opacity:0.4; box-shadow:0 0 0 4px var(--teal), 0 5px 0 rgba(21,54,80,0.25); cursor:default; }
-  .match-btn.shake{ animation:shake .3s ease; }
+  .pair-tile:active{ transform:translateY(3px); }
+  .pair-tile.selected{ box-shadow:0 0 0 4px var(--coral), 0 5px 0 rgba(21,54,80,0.25); }
+  .pair-tile.matched{ box-shadow:0 0 0 4px var(--teal), 0 5px 0 rgba(21,54,80,0.25); }
+  .pair-tile.fading{ opacity:0; transform:scale(0.6); transition:opacity .2s ease, transform .2s ease; }
+  .pair-tile.shake{ animation:shake .3s ease; }
   @keyframes shake{ 0%,100%{transform:translateX(0);} 25%{transform:translateX(-6px);} 75%{transform:translateX(6px);} }
 
   /* ================= DRESS UP ================= */
   #dressStage{ position:relative; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; }
   #dressCanvas{ position:relative; flex:1 1 auto; min-height:0; width:100%; display:flex; align-items:center; justify-content:center; }
-  #dressBase{ font-size:clamp(140px,34vmin,280px); transition:transform .15s ease; }
-  #dressBase.pop-swap{ animation:dressPop .3s ease; }
-  @keyframes dressPop{ 0%{transform:scale(0.7);} 60%{transform:scale(1.12);} 100%{transform:scale(1);} }
+  #dressCanvas svg{ display:block; }
   #dressStickers{ display:flex; gap:16px; flex:0 0 auto; flex-wrap:wrap; justify-content:center; min-height:clamp(64px,14vmin,96px); align-items:center; }
   .sticker{
     font-size:clamp(46px,11vmin,72px);
@@ -563,7 +594,6 @@
     <span class="tb-title" id="gameTitle">Jeu</span>
   </div>
   <div class="controlbar">
-    <button class="tb-btn ghost" id="backBtn">← Accueil</button>
     <div class="diff-group">
       <span class="diffbar-label">🎚️</span>
       <div class="cslider" id="diffSlider">
@@ -580,8 +610,9 @@
       <span class="diffbar-value" id="diffValue">2</span>
     </div>
     <div class="topbar-right">
-      <button class="tb-btn icon ghost" id="fullscreenBtn" title="Plein écran">⛶</button>
       <button class="tb-btn" id="newBtn">🔀 Nouveau</button>
+      <button class="tb-btn icon ghost" id="fullscreenBtn" title="Plein écran">⛶</button>
+      <button class="tb-btn ghost" id="backBtn">← Accueil</button>
     </div>
   </div>
   <div id="gameArea"></div>
@@ -668,6 +699,7 @@
         case 'horse': tone(220,520,0.25,'sawtooth',0,0.3); tone(500,320,0.22,'sawtooth',0.26,0.24); break;
         case 'pig': tone(160,120,0.1,'sawtooth',0,0.28); tone(160,120,0.1,'sawtooth',0.13,0.28); tone(160,105,0.14,'sawtooth',0.27,0.28); break;
         case 'frog': tone(220,150,0.12,'sawtooth',0,0.28); break;
+        case 'rooster': tone(400,700,0.12,'sawtooth',0,0.3); tone(700,850,0.1,'sawtooth',0.13,0.28); tone(850,500,0.18,'sawtooth',0.24,0.24); break;
         case 'roar': tone(70,95,0.5,'sawtooth',0,0.35); break;
       }
     }catch(err){ /* ignore */ }
@@ -1366,11 +1398,11 @@
     '🦓':'Le zèbre','🐍':'Le serpent','🦜':'Le perroquet','🐊':'Le crocodile','🦍':'Le gorille',
     '🐳':'La baleine','🐬':'Le dauphin','🐠':'Le poisson','🐡':'Le poisson-globe','🦀':'Le crabe',
     '🐙':'La pieuvre','🦑':'Le calamar','🦈':'Le requin','🐢':'La tortue','🦞':'Le homard',
-    '🐕':'Le chien'
+    '🐕':'Le chien','🐇':'Le lapin','🐓':'Le coq','🐵':'Le singe'
   };
   const ANIMAL_CRY_KIND = {
     '🐶':'dog','🐕':'dog','🐱':'cat','🐄':'cow','🐑':'sheep','🐐':'sheep',
-    '🦆':'duck','🐴':'horse','🐷':'pig','🐸':'frog',
+    '🦆':'duck','🐴':'horse','🐷':'pig','🐸':'frog','🐓':'rooster',
     '🐻':'roar','🐯':'roar','🦁':'roar'
   };
 
@@ -1431,11 +1463,15 @@
       playRow.id = 'findPlayRow';
       const playBtn = document.createElement('button');
       playBtn.id = 'findPlayBtn';
-      playBtn.textContent = '▶️';
+      playBtn.textContent = '▶️ Écouter';
       const targetLabel = document.createElement('div');
       targetLabel.id = 'findTargetLabel';
       targetLabel.textContent = '?';
-      playRow.appendChild(playBtn); playRow.appendChild(targetLabel);
+      const newRoundBtn = document.createElement('button');
+      newRoundBtn.id = 'findNewRoundBtn';
+      newRoundBtn.textContent = '🔀';
+      newRoundBtn.title = 'Un autre animal à trouver';
+      playRow.appendChild(playBtn); playRow.appendChild(targetLabel); playRow.appendChild(newRoundBtn);
       const grid = document.createElement('div');
       grid.id = 'animalGrid';
       stage.appendChild(playRow); stage.appendChild(grid);
@@ -1445,7 +1481,7 @@
       const themeKey = rand(['ferme','jungle','ocean','animaux']);
       const count = Math.min(diffN(3,8), SETS[themeKey].length);
       const chosen = pickN(SETS[themeKey], count);
-      const target = rand(chosen);
+      let target = rand(chosen);
       const {cols, rows} = gridDims(chosen.length);
       grid.style.gridTemplateColumns = `repeat(${cols},1fr)`;
       grid.style.gridTemplateRows = `repeat(${rows},1fr)`;
@@ -1460,10 +1496,19 @@
       announce();
 
       let answered = false;
+      const tileEls = {};
+      newRoundBtn.addEventListener('click', ()=>{
+        Object.values(tileEls).forEach(el=> el.classList.remove('placed-correct-anim'));
+        target = rand(chosen);
+        answered = false;
+        announce();
+      });
+
       chosen.forEach(emoji=>{
         const btn = document.createElement('div');
         btn.className = 'animal-btn';
         btn.textContent = emoji;
+        tileEls[emoji] = btn;
         btn.addEventListener('click', ()=>{
           if(answered) return;
           if(emoji === target){
@@ -1605,179 +1650,282 @@
      GAME 9 — CONNECT THE DOTS
      ============================================================ */
   const gameDots = {
-    id:'dots', icon:'🔗', title:'Relie les paires', color:'#F4B93E', desc:'Associe chaque objet à son jumeau',
+    id:'dots', icon:'🔗', title:'Relie les paires', color:'#F4B93E', desc:'Trouve les jumeaux',
     init(root){
       const wrap = document.createElement('div');
       wrap.className = 'game-root';
       const instr = document.createElement('div');
       instr.className = 'game-instructions';
-      instr.textContent = 'Touche un objet, puis touche son jumeau de l\'autre côté !';
+      instr.textContent = 'Touche deux objets identiques pour former une paire !';
       const stage = document.createElement('div');
-      stage.id = 'matchStage';
-      const svgLayer = document.createElementNS('http://www.w3.org/2000/svg','svg');
-      svgLayer.setAttribute('id','matchLines');
-      const colLeft = document.createElement('div');
-      colLeft.className = 'match-col';
-      const colRight = document.createElement('div');
-      colRight.className = 'match-col';
-      stage.appendChild(svgLayer);
-      stage.appendChild(colLeft);
-      stage.appendChild(colRight);
+      stage.id = 'pairStage';
+      const foundPanel = document.createElement('div');
+      foundPanel.id = 'pairFound';
+      foundPanel.innerHTML = '<div class="pair-found-label">✅ Trouvées</div>';
+      const mainGrid = document.createElement('div');
+      mainGrid.id = 'pairGrid';
+      stage.appendChild(foundPanel); stage.appendChild(mainGrid);
       wrap.appendChild(instr); wrap.appendChild(stage);
       root.appendChild(wrap);
 
-      const n = diffN(3,6);
+      const pairs = diffN(3,10);
       const themeKey = rand(Object.keys(SETS));
-      const items = pickN(SETS[themeKey], n);
-      const leftOrder = shuffle(items);
-      const rightOrder = shuffle(items);
+      const items = pickN(SETS[themeKey], pairs);
+      const tiles = shuffle(items.concat(items));
+      const total = tiles.length;
+      const cols = Math.max(3, Math.min(6, Math.ceil(Math.sqrt(total*1.2))));
+      mainGrid.style.gridTemplateColumns = `repeat(${cols},1fr)`;
 
-      const matched = new Set();
-      const btnsLeft = {}, btnsRight = {};
+      let selected = null;
+      let foundCount = 0;
 
-      function makeBtn(emoji, col){
-        const b = document.createElement('div');
-        b.className = 'match-btn';
-        b.textContent = emoji;
-        col.appendChild(b);
-        return b;
-      }
-      leftOrder.forEach(em => btnsLeft[em] = makeBtn(em, colLeft));
-      rightOrder.forEach(em => btnsRight[em] = makeBtn(em, colRight));
+      tiles.forEach(em=>{
+        const btn = document.createElement('div');
+        btn.className = 'pair-tile';
+        btn.textContent = em;
+        btn.dataset.em = em;
+        btn.addEventListener('click', ()=>{
+          if(btn.classList.contains('matched') || btn.classList.contains('fading')) return;
 
-      function resizeSvg(){
-        const r = stage.getBoundingClientRect();
-        svgLayer.setAttribute('width', r.width);
-        svgLayer.setAttribute('height', r.height);
-        svgLayer.setAttribute('viewBox', `0 0 ${r.width} ${r.height}`);
-      }
-      resizeSvg();
-
-      function drawLine(elA, elB){
-        const stageR = stage.getBoundingClientRect();
-        const a = elA.getBoundingClientRect();
-        const b = elB.getBoundingClientRect();
-        const line = document.createElementNS('http://www.w3.org/2000/svg','line');
-        line.setAttribute('x1', a.left + a.width/2 - stageR.left);
-        line.setAttribute('y1', a.top + a.height/2 - stageR.top);
-        line.setAttribute('x2', b.left + b.width/2 - stageR.left);
-        line.setAttribute('y2', b.top + b.height/2 - stageR.top);
-        line.setAttribute('stroke', '#2C8C7E');
-        line.setAttribute('stroke-width', '6');
-        line.setAttribute('stroke-linecap', 'round');
-        svgLayer.appendChild(line);
-      }
-
-      let selected = null; // { btn, side: 'left'|'right' }
-
-      function clearSelection(){
-        Object.values(btnsLeft).forEach(x=>x.classList.remove('selected'));
-        Object.values(btnsRight).forEach(x=>x.classList.remove('selected'));
-        selected = null;
-      }
-
-      function handleClick(btn, side){
-        if(matched.has(btn.dataset.em)) return;
-
-        if(!selected){
-          clearSelection();
-          selected = { btn, side };
-          btn.classList.add('selected');
-          soundPop();
-          return;
-        }
-
-        if(selected.side === side){
-          // picking a different item on the SAME side just changes the selection
-          clearSelection();
-          selected = { btn, side };
-          btn.classList.add('selected');
-          soundPop();
-          return;
-        }
-
-        // opposite side tapped: try to match
-        if(selected.btn.dataset.em === btn.dataset.em){
-          matched.add(btn.dataset.em);
-          selected.btn.classList.remove('selected');
-          selected.btn.classList.add('matched');
-          btn.classList.add('matched');
-          drawLine(selected.btn, btn);
-          soundPop();
-          selected = null;
-          if(matched.size === items.length) setTimeout(celebrate, 200);
-        } else {
-          soundOops();
-          btn.classList.add('shake');
-          setTimeout(()=> btn.classList.remove('shake'), 300);
-        }
-      }
-
-      Object.values(btnsLeft).forEach(btn=>{
-        btn.dataset.em = btn.textContent;
-        btn.addEventListener('click', ()=> handleClick(btn, 'left'));
-      });
-      Object.values(btnsRight).forEach(btn=>{
-        btn.dataset.em = btn.textContent;
-        btn.addEventListener('click', ()=> handleClick(btn, 'right'));
+          if(selected === btn){
+            btn.classList.remove('selected');
+            selected = null;
+            return;
+          }
+          if(!selected){
+            selected = btn;
+            btn.classList.add('selected');
+            soundPop();
+            return;
+          }
+          if(selected.dataset.em === btn.dataset.em){
+            selected.classList.add('matched'); btn.classList.add('matched');
+            selected.classList.add('fading'); btn.classList.add('fading');
+            soundPop();
+            const gone1 = selected, gone2 = btn;
+            selected = null;
+            const chip = document.createElement('div');
+            chip.className = 'pair-found-item';
+            chip.textContent = em;
+            foundPanel.appendChild(chip);
+            foundCount++;
+            setTimeout(()=>{ gone1.remove(); gone2.remove(); }, 220);
+            if(foundCount === pairs) setTimeout(celebrate, 300);
+          } else {
+            soundOops();
+            const prev = selected;
+            btn.classList.add('shake');
+            selected = null;
+            setTimeout(()=>{ prev.classList.remove('selected'); btn.classList.remove('shake'); }, 350);
+          }
+        });
+        mainGrid.appendChild(btn);
       });
 
-      window.addEventListener('resize', resizeSvg);
-      return function cleanup(){ window.removeEventListener('resize', resizeSvg); };
+      function fitPairGrid(){
+        const availW = mainGrid.getBoundingClientRect().width;
+        const availH = mainGrid.getBoundingClientRect().height;
+        const rows = Math.ceil(total/cols);
+        const gap = 10;
+        const sizeW = (availW - (cols-1)*gap) / cols;
+        const sizeH = (availH - (rows-1)*gap) / rows;
+        const size = Math.max(36, Math.min(sizeW, sizeH, 130));
+        mainGrid.querySelectorAll('.pair-tile').forEach(t=>{
+          t.style.width = size+'px';
+          t.style.height = size+'px';
+          t.style.fontSize = Math.round(size*0.5)+'px';
+        });
+      }
+      requestAnimationFrame(fitPairGrid);
+      window.addEventListener('resize', fitPairGrid);
+      return function cleanup(){ window.removeEventListener('resize', fitPairGrid); };
     }
   };
 
   /* ============================================================
      GAME 10 — DRESS UP (creative, no wrong answer)
      ============================================================ */
+  function pzSvgEl(svg, tag, attrs){
+    const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    for(const k in attrs) e.setAttribute(k, attrs[k]);
+    svg.appendChild(e);
+    return e;
+  }
+
+  function buildBonhommeSVG(svg, s){
+    svg.innerHTML = '';
+    const el = (tag, attrs) => pzSvgEl(svg, tag, attrs);
+    el('path', {d:'M70,320 Q70,225 150,225 Q230,225 230,320 Z', fill:'#3B7DE5'});
+    el('rect', {x:135,y:195,width:30,height:35,fill:'#FFD9A0'});
+    el('circle', {cx:68,cy:145,r:16,fill:'#FFD9A0',stroke:'#3A2E27','stroke-width':4});
+    el('circle', {cx:232,cy:145,r:16,fill:'#FFD9A0',stroke:'#3A2E27','stroke-width':4});
+    el('circle', {cx:150,cy:140,r:85,fill:'#FFD9A0',stroke:'#3A2E27','stroke-width':4});
+    el('path', {d:'M105,105 Q120,95 138,103', fill:'none',stroke:'#3A2E27','stroke-width':5,'stroke-linecap':'round'});
+    el('path', {d:'M162,103 Q180,95 195,105', fill:'none',stroke:'#3A2E27','stroke-width':5,'stroke-linecap':'round'});
+
+    if(s.sunglasses){
+      el('circle', {cx:122,cy:128,r:24,fill:'#2B2B2B',stroke:'#3A2E27','stroke-width':4});
+      el('circle', {cx:178,cy:128,r:24,fill:'#2B2B2B',stroke:'#3A2E27','stroke-width':4});
+      el('line', {x1:146,y1:128,x2:154,y2:128,stroke:'#3A2E27','stroke-width':4});
+    } else if(s.glasses){
+      el('circle', {cx:122,cy:128,r:24,fill:'#EAF5FC',stroke:'#3A2E27','stroke-width':4});
+      el('circle', {cx:178,cy:128,r:24,fill:'#EAF5FC',stroke:'#3A2E27','stroke-width':4});
+      el('line', {x1:146,y1:128,x2:154,y2:128,stroke:'#3A2E27','stroke-width':4});
+      el('circle', {cx:122,cy:128,r:6,fill:'#3A2E27'});
+      el('circle', {cx:178,cy:128,r:6,fill:'#3A2E27'});
+    } else {
+      el('circle', {cx:122,cy:128,r:7,fill:'#3A2E27'});
+      el('circle', {cx:178,cy:128,r:7,fill:'#3A2E27'});
+    }
+
+    el('path', {d:'M150,130 L145,155 Q150,162 155,155 Z', fill:'none',stroke:'#3A2E27','stroke-width':3});
+
+    if(s.mustache){
+      el('path', {d:'M110,168 Q130,178 150,168 Q170,178 190,168 Q170,158 150,166 Q130,158 110,168 Z', fill:'#5B3A1F'});
+    }
+    el('path', {d: s.mustache ? 'M125,182 Q150,196 175,182' : 'M118,165 Q150,192 182,165', fill:'none',stroke:'#3A2E27','stroke-width':5,'stroke-linecap':'round'});
+
+    if(s.bowtie){
+      el('path', {d:'M130,215 L150,205 L150,225 Z', fill:'#F0562E'});
+      el('path', {d:'M170,215 L150,205 L150,225 Z', fill:'#F0562E'});
+      el('circle', {cx:150,cy:215,r:6,fill:'#C7411E'});
+    }
+
+    if(s.hat==='top'){
+      el('rect', {x:105,y:20,width:90,height:60,rx:4,fill:'#1C3A52'});
+      el('rect', {x:90,y:75,width:120,height:14,rx:4,fill:'#1C3A52'});
+    } else if(s.hat==='cowboy'){
+      el('ellipse', {cx:150,cy:85,rx:105,ry:20,fill:'#8B5A2B'});
+      el('path', {d:'M110,85 Q150,25 190,85 Z', fill:'#8B5A2B'});
+      el('rect', {x:110,y:78,width:80,height:10,fill:'#5B3A1F'});
+    } else if(s.hat==='santa'){
+      el('path', {d:'M90,80 Q150,-10 220,90 Q170,60 90,80 Z', fill:'#E5473B'});
+      el('circle', {cx:222,cy:88,r:14,fill:'white'});
+      el('rect', {x:80,y:75,width:150,height:20,rx:10,fill:'white'});
+    } else if(s.hat==='crown'){
+      el('path', {d:'M95,80 L110,35 L135,65 L150,25 L165,65 L190,35 L205,80 Z', fill:'#F4B93E',stroke:'#C98F1F','stroke-width':3});
+      el('circle', {cx:150,cy:50,r:6,fill:'#E5473B'});
+    }
+  }
+
+  function buildMaisonSVG(svg, s){
+    svg.innerHTML = '';
+    const el = (tag, attrs) => pzSvgEl(svg, tag, attrs);
+    el('rect', {x:0,y:0,width:320,height:260, fill: s.night ? '#1C3A52' : '#BFE3F5'});
+    el('rect', {x:0,y:210,width:320,height:50, fill:'#7CC576'});
+
+    if(s.night){
+      el('circle', {cx:260,cy:50,r:26,fill:'#F4FAFF'});
+      [[40,40],[80,25],[140,55],[200,30],[280,90]].forEach(([x,y])=> el('circle',{cx:x,cy:y,r:3,fill:'white'}));
+    } else if(s.sun){
+      el('circle', {cx:260,cy:50,r:30,fill:'#F4B93E'});
+      for(let i=0;i<8;i++){
+        const a = i*Math.PI/4;
+        el('line', {x1:260+Math.cos(a)*38, y1:50+Math.sin(a)*38, x2:260+Math.cos(a)*52, y2:50+Math.sin(a)*52, stroke:'#F4B93E','stroke-width':5,'stroke-linecap':'round'});
+      }
+    }
+
+    if(s.rainbow){
+      const colors=['#E5473B','#F0872E','#F2C230','#3EA35C','#3B7DE5','#8B5FBF'];
+      colors.forEach((c,i)=>{
+        el('path', {d:`M20,210 A${130-i*10},${130-i*10} 0 0 1 300,210`, fill:'none', stroke:c,'stroke-width':9});
+      });
+    }
+    if(s.tree){
+      el('rect', {x:255,y:165,width:16,height:50,fill:'#8B5A2B'});
+      el('circle', {cx:263,cy:150,r:34,fill:'#3EA35C'});
+    }
+
+    el('rect', {x:70,y:130,width:140,height:90,fill:'#EE6FA6'});
+    el('path', {d:'M60,130 L140,70 L220,130 Z', fill:'#8B5A2B'});
+    el('rect', {x:125,y:165,width:34,height:55,fill:'#5B3A1F'});
+    el('rect', {x:85,y:145,width:28,height:28,fill:'#EAF5FC',stroke:'#3A2E27','stroke-width':3});
+    el('rect', {x:167,y:145,width:28,height:28,fill:'#EAF5FC',stroke:'#3A2E27','stroke-width':3});
+    el('rect', {x:170,y:80,width:14,height:26,fill:'#8B5A2B'});
+
+    if(s.smoke){
+      el('circle', {cx:177,cy:65,r:8,fill:'rgba(255,255,255,0.85)'});
+      el('circle', {cx:185,cy:50,r:10,fill:'rgba(255,255,255,0.85)'});
+      el('circle', {cx:180,cy:35,r:12,fill:'rgba(255,255,255,0.85)'});
+    }
+    if(s.flowers){
+      [40,100,220,280].forEach(x=>{
+        el('circle', {cx:x,cy:220,r:3,fill:'#3EA35C'});
+        ['#E5473B','#F2C230','#EE6FA6','#8B5FBF'].forEach((c,i)=>{
+          const a = i*Math.PI/2;
+          el('circle', {cx:x+Math.cos(a)*6, cy:220+Math.sin(a)*6, r:5, fill:c});
+        });
+      });
+    }
+  }
+
   const DRESS_THEMES = [
-    { label:'Habille le bonhomme !', base:'😐',
+    {
+      label:'Habille le bonhomme !', viewBox:'0 0 300 320', build: buildBonhommeSVG,
+      initialState: ()=>({glasses:false, sunglasses:false, hat:null, mustache:false, bowtie:false}),
       options:[
-        {icon:'😐', name:'visage nu', result:'😐'},
-        {icon:'👓', name:'lunettes', result:'🤓'},
-        {icon:'🕶️', name:'lunettes de soleil', result:'😎'},
-        {icon:'🎉', name:'fête', result:'🥳'},
-        {icon:'🤠', name:'chapeau cowboy', result:'🤠'},
-        {icon:'🎅', name:'père Noël', result:'🎅'},
-        {icon:'🤡', name:'clown', result:'🤡'},
-        {icon:'👽', name:'extraterrestre', result:'👽'}
+        {icon:'🔄', name:'remettre à zéro', apply:(s)=>{ s.glasses=false; s.sunglasses=false; s.hat=null; s.mustache=false; s.bowtie=false; }},
+        {icon:'👓', name:'lunettes', apply:(s)=>{ s.glasses=true; s.sunglasses=false; }},
+        {icon:'🕶️', name:'lunettes de soleil', apply:(s)=>{ s.sunglasses=true; s.glasses=false; }},
+        {icon:'🎩', name:'haut-de-forme', apply:(s)=>{ s.hat='top'; }},
+        {icon:'🤠', name:'chapeau cowboy', apply:(s)=>{ s.hat='cowboy'; }},
+        {icon:'🎅', name:'bonnet de Noël', apply:(s)=>{ s.hat='santa'; }},
+        {icon:'👑', name:'couronne', apply:(s)=>{ s.hat='crown'; }},
+        {icon:'💇', name:'moustache', apply:(s)=>{ s.mustache=!s.mustache; }},
+        {icon:'🎀', name:'noeud papillon', apply:(s)=>{ s.bowtie=!s.bowtie; }}
       ]
     },
-    { label:'Change l\'humeur du chat !', base:'😺',
+    {
+      label:'Décore la maison !', viewBox:'0 0 320 260', build: buildMaisonSVG,
+      initialState: ()=>({sun:false, night:false, rainbow:false, tree:false, flowers:false, smoke:false}),
       options:[
-        {icon:'😺', name:'normal', result:'😺'},
-        {icon:'😸', name:'joyeux', result:'😸'},
-        {icon:'😹', name:'rigolo', result:'😹'},
-        {icon:'😻', name:'amoureux', result:'😻'},
-        {icon:'😼', name:'malicieux', result:'😼'},
-        {icon:'😿', name:'triste', result:'😿'},
-        {icon:'😾', name:'fâché', result:'😾'},
-        {icon:'🙀', name:'surpris', result:'🙀'}
+        {icon:'🔄', name:'remettre à zéro', apply:(s)=>{ Object.keys(s).forEach(k=> s[k]=false); }},
+        {icon:'☀️', name:'soleil', apply:(s)=>{ s.sun=true; s.night=false; }},
+        {icon:'🌙', name:'nuit', apply:(s)=>{ s.night=true; s.sun=false; }},
+        {icon:'🌈', name:'arc-en-ciel', apply:(s)=>{ s.rainbow=!s.rainbow; }},
+        {icon:'🌳', name:'arbre', apply:(s)=>{ s.tree=!s.tree; }},
+        {icon:'🌸', name:'fleurs', apply:(s)=>{ s.flowers=!s.flowers; }},
+        {icon:'💨', name:'fumée de cheminée', apply:(s)=>{ s.smoke=!s.smoke; }}
       ]
     }
   ];
+
   const gameDress = {
     id:'dress', icon:'🎩', title:'Décore-moi', color:'#C0568F', desc:'Glisse un accessoire, le dessin change !',
     init(root){
       const wrap = document.createElement('div');
       wrap.className = 'game-root';
       const theme = rand(DRESS_THEMES);
+      const state = theme.initialState();
       const instr = document.createElement('div');
       instr.className = 'game-instructions';
-      instr.textContent = 'Glisse un accessoire sur le personnage !';
+      instr.textContent = 'Glisse un accessoire sur le dessin !';
       const stage = document.createElement('div');
       stage.id = 'dressStage';
       const canvas = document.createElement('div');
       canvas.id = 'dressCanvas';
-      const base = document.createElement('div');
-      base.id = 'dressBase';
-      base.textContent = theme.base;
-      canvas.appendChild(base);
+      const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+      const vb = theme.viewBox.split(' ').map(Number);
+      svg.setAttribute('viewBox', theme.viewBox);
+      canvas.appendChild(svg);
       const optionRow = document.createElement('div');
       optionRow.id = 'dressStickers';
       stage.appendChild(canvas); stage.appendChild(optionRow);
       wrap.appendChild(instr); wrap.appendChild(stage);
       root.appendChild(wrap);
+
+      theme.build(svg, state);
+
+      function sizeSvg(){
+        const r = canvas.getBoundingClientRect();
+        const ratio = vb[2]/vb[3];
+        let w = Math.max(0, r.width-8), h = w/ratio;
+        if(h > r.height-8){ h = Math.max(0, r.height-8); w = h*ratio; }
+        svg.setAttribute('width', Math.max(160, w));
+        svg.setAttribute('height', Math.max(160, h));
+      }
+      requestAnimationFrame(sizeSvg);
+      window.addEventListener('resize', sizeSvg);
 
       const chosen = [theme.options[0], ...pickN(theme.options.slice(1), Math.min(diffN(3,7), theme.options.length-1))];
       chosen.forEach(opt=>{
@@ -1792,16 +1940,16 @@
             const r = canvas.getBoundingClientRect();
             const nearCanvas = cx>=r.left-30 && cx<=r.right+30 && cy>=r.top-30 && cy<=r.bottom+30;
             if(nearCanvas){
-              base.textContent = opt.result;
-              base.classList.remove('pop-swap');
-              void base.offsetWidth;
-              base.classList.add('pop-swap');
+              opt.apply(state);
+              theme.build(svg, state);
               soundPop();
             }
             return false; // the chip always snaps back to the tray, ready to try again
           }
         });
       });
+
+      return function cleanup(){ window.removeEventListener('resize', sizeSvg); };
     }
   };
 
@@ -1822,10 +1970,12 @@
       baskets.id = 'sortBaskets';
       const bFruit = document.createElement('div');
       bFruit.className = 'basket'; bFruit.dataset.kind='fruits';
-      bFruit.innerHTML = '<span class="ic">🧺</span><span>Fruits</span>';
+      bFruit.innerHTML = '<span class="ic">🍎🍌</span>';
+      bFruit.title = 'Fruits';
       const bVeg = document.createElement('div');
       bVeg.className = 'basket'; bVeg.dataset.kind='legumes';
-      bVeg.innerHTML = '<span class="ic">🧺</span><span>Légumes</span>';
+      bVeg.innerHTML = '<span class="ic">🥕🥦</span>';
+      bVeg.title = 'Légumes';
       baskets.appendChild(bFruit); baskets.appendChild(bVeg);
       const tray = document.createElement('div');
       tray.id = 'sortTray';
