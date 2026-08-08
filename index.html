@@ -20,6 +20,8 @@
     --coral:#F0562E;
     --coral-dark:#C7411E;
     --gold:#F4B93E;
+    --mat-a:#EAF5FC;
+    --mat-b:#D3E9F8;
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html, body{
@@ -49,6 +51,11 @@
     align-items:center;
     padding:20px 16px;
     overflow:hidden;
+  }
+  #fullscreenBtnHome{
+    position:absolute;
+    top:16px; right:16px;
+    z-index:5;
   }
   #homeHeader{
     flex:0 0 auto;
@@ -396,7 +403,7 @@
   #dressStage{ position:relative; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; }
   #dressCanvas{ position:relative; flex:1 1 auto; min-height:0; width:100%; display:flex; align-items:center; justify-content:center; }
   #dressBase{ font-size:clamp(140px,34vmin,280px); }
-  #dressStickers{ display:flex; gap:16px; flex:0 0 auto; flex-wrap:wrap; justify-content:center; }
+  #dressStickers{ display:flex; gap:16px; flex:0 0 auto; flex-wrap:wrap; justify-content:center; min-height:clamp(64px,14vmin,96px); align-items:center; }
   .sticker{
     font-size:clamp(46px,11vmin,72px);
     touch-action:none;
@@ -430,11 +437,82 @@
   .sort-item.gone{ visibility:hidden; }
 
   footer.credit{ display:none; }
+
+  /* ================= PUZZLE (12th game) ================= */
+  .pz-chooser{
+    display:flex; flex-direction:column; align-items:center; gap:18px;
+  }
+  .pz-chooser-btn{
+    border-radius:18px;
+    padding:18px 30px;
+    font-size:clamp(16px,3vmin,22px);
+    font-weight:600;
+    color:white;
+    background:var(--teal);
+    box-shadow:0 6px 0 var(--teal-dark);
+  }
+  .pz-chooser-btn:active{ transform:translateY(4px); box-shadow:0 1px 0 var(--teal-dark); }
+  #pzFileInput{ display:none; }
+  .pz-play-area{
+    display:flex;
+    flex-wrap:wrap;
+    gap:16px;
+    align-items:center;
+    justify-content:center;
+    width:100%; height:100%;
+  }
+  @media (min-width:701px), (orientation:landscape){
+    .pz-play-area{ flex-wrap:nowrap !important; }
+  }
+  .pz-frame-outer{
+    flex:0 0 auto;
+    background:linear-gradient(155deg,var(--wood-1),var(--wood-2));
+    border-radius:10px;
+    padding:12px;
+    box-shadow:0 10px 0 rgba(0,0,0,0.18), inset 0 0 0 2px rgba(255,255,255,0.08);
+  }
+  .pz-frame{
+    position:relative;
+    background:repeating-conic-gradient(var(--mat-a) 0% 25%,var(--mat-b) 0% 50%) 50% / 24px 24px;
+    border-radius:3px;
+    box-shadow:inset 0 0 0 4px rgba(255,255,255,0.55), inset 0 2px 6px rgba(0,0,0,0.15);
+    overflow:visible;
+  }
+  .pz-watermark{ position:absolute; top:0; left:0; opacity:0.28; pointer-events:none; z-index:0; -webkit-user-select:none; user-select:none; }
+  .pz-slot{ position:absolute; border:2px dashed rgba(21,54,80,0.28); box-sizing:border-box; pointer-events:none; z-index:1; }
+  .pz-tray-wrap{
+    flex:0 0 auto;
+    width:clamp(160px,20vmin,260px);
+    background:rgba(255,252,245,0.6);
+    border:3px dashed rgba(21,54,80,0.3);
+    border-radius:12px;
+    padding:10px;
+    display:flex; flex-direction:column;
+    max-height:100%;
+  }
+  .pz-tray-label{ flex:0 0 auto; font-weight:700; font-size:12px; color:var(--wood-2); text-align:center; margin-bottom:6px; }
+  .pz-tray{
+    flex:1 1 auto; min-height:0; overflow:hidden;
+    display:flex; flex-wrap:wrap; gap:6px; align-content:center; justify-content:center;
+  }
+  @media (max-width:700px) and (orientation:portrait){
+    .pz-tray-wrap{ height:150px !important; max-width:none; width:100%; }
+  }
+  .pz-piece{
+    cursor:grab; touch-action:none;
+    -webkit-user-select:none; user-select:none; -webkit-touch-callout:none;
+    filter:drop-shadow(0 3px 4px rgba(0,0,0,0.3));
+    z-index:5;
+  }
+  .pz-piece.in-frame{ position:absolute; z-index:2; }
+  .pz-piece.dragging{ cursor:grabbing; z-index:999; }
+  .pz-piece.placed-correct{ filter:drop-shadow(0 0 0 3px var(--teal)) drop-shadow(0 3px 4px rgba(0,0,0,0.3)); }
 </style>
 </head>
 <body>
 
 <div id="screenHome" class="screen active">
+  <button class="tb-btn icon ghost" id="fullscreenBtnHome" title="Plein écran">⛶</button>
   <div id="homeHeader">
     <h1>🎮 Mini-Jeux</h1>
     <p>Touche un jeu pour commencer !</p>
@@ -571,7 +649,16 @@
     }catch(err){}
   }
 
-  const BRAVOS = ['Bravo !','Super !','Génial !','Trop bien !','Bien joué !','Youpi !'];
+  const BRAVOS = [
+    'Bravo !','Super !','Génial !','Trop bien !','Bien joué !','Youpi !',
+    'Bravo, Paul ! Tu es un champion !',
+    'Super ! Paul, tu es trop fort !',
+    'Ouah ! Bravo, mon baboun !',
+    'Excellent, ti bouchon !',
+    'Ah ! Il gère, le bidouk !',
+    'C\'est gagné, Monsieur Paul !',
+    'Ça, c\'est parfait, bouchon tout rond !'
+  ];
   function celebrate(){
     soundGood();
     const phrase = BRAVOS[Math.floor(Math.random()*BRAVOS.length)];
@@ -580,17 +667,22 @@
   }
 
   // ---- fullscreen ----
+  const fullscreenBtnHome = document.getElementById('fullscreenBtnHome');
   function fsElement(){ return document.fullscreenElement || document.webkitFullscreenElement || null; }
   function requestFs(el){ const fn = el.requestFullscreen || el.webkitRequestFullscreen; if(fn) return fn.call(el); }
   function exitFs(){ const fn = document.exitFullscreen || document.webkitExitFullscreen; if(fn) return fn.call(document); }
   const fsSupported = !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen);
-  if(!fsSupported) fullscreenBtn.classList.add('hidden');
+  if(!fsSupported){ fullscreenBtn.classList.add('hidden'); fullscreenBtnHome.classList.add('hidden'); }
   function updateFsBtn(){
-    fullscreenBtn.textContent = fsElement() ? '⤢' : '⛶';
+    const icon = fsElement() ? '⤢' : '⛶';
+    fullscreenBtn.textContent = icon;
+    fullscreenBtnHome.textContent = icon;
   }
-  fullscreenBtn.addEventListener('click', ()=>{
+  function toggleFullscreen(){
     try{ if(fsElement()) exitFs(); else requestFs(document.documentElement); }catch(err){}
-  });
+  }
+  fullscreenBtn.addEventListener('click', toggleFullscreen);
+  fullscreenBtnHome.addEventListener('click', toggleFullscreen);
   document.addEventListener('fullscreenchange', updateFsBtn);
   document.addEventListener('webkitfullscreenchange', updateFsBtn);
 
@@ -903,7 +995,6 @@
       wrap.className = 'game-root';
       const instr = document.createElement('div');
       instr.className = 'game-instructions';
-      instr.textContent = 'Touche les bulles pour les faire éclater !';
       const stage = document.createElement('div');
       stage.className = 'game-stage';
       const bubbleStage = document.createElement('div');
@@ -914,11 +1005,18 @@
 
       const themeKey = rand(['animaux','fruits','jouets','ferme','ocean']);
       const items = SETS[themeKey];
+      const total = diffN(8,20);
+      let spawned = 0, popped = 0;
       let stopped = false;
       const timers = [];
 
+      function updateInstr(){
+        instr.textContent = `Fais éclater toutes les bulles ! (${popped}/${total})`;
+      }
+      updateInstr();
+
       function spawnBubble(){
-        if(stopped || !bubbleStage.isConnected) return;
+        if(stopped || !bubbleStage.isConnected || spawned >= total) return;
         const rect = bubbleStage.getBoundingClientRect();
         if(rect.width < 20 || rect.height < 20) return;
         const size = 64 + Math.random()*56;
@@ -929,19 +1027,25 @@
         b.style.height = size+'px';
         b.style.left = (Math.random()*(rect.width-size))+'px';
         b.style.top = (Math.random()*(rect.height-size))+'px';
+        spawned++;
         b.addEventListener('click', ()=>{
           if(b.classList.contains('pop')) return;
           b.classList.add('pop');
           soundPop();
+          popped++;
+          updateInstr();
           timers.push(setTimeout(()=> b.remove(), 180));
+          if(popped >= total) setTimeout(celebrate, 250);
         });
         bubbleStage.appendChild(b);
-        timers.push(setTimeout(()=>{ if(b.isConnected && !b.classList.contains('pop')) b.remove(); }, 6000));
       }
 
       const spawnGap = diffN(1300, 550);
-      for(let i=0;i<6;i++) timers.push(setTimeout(spawnBubble, i*180));
-      const interval = setInterval(spawnBubble, spawnGap);
+      for(let i=0;i<Math.min(6,total);i++) timers.push(setTimeout(spawnBubble, i*180));
+      const interval = setInterval(()=>{
+        spawnBubble();
+        if(spawned >= total) clearInterval(interval);
+      }, spawnGap);
 
       return function cleanup(){
         stopped = true;
@@ -1080,14 +1184,18 @@
       svgWrap.appendChild(svg);
 
       function sizeSvg(){
-        const r = svgWrap.getBoundingClientRect();
+        const gaRect = gameArea.getBoundingClientRect();
+        const instrH = instr.getBoundingClientRect().height;
+        const paletteH = palette.getBoundingClientRect().height;
+        const availW = gaRect.width - 24;
+        const availH = gaRect.height - instrH - paletteH - 40;
         const ratio = vb[2]/vb[3];
-        let w = Math.max(0, r.width - 8), h = w / ratio;
-        if(h > r.height - 8){ h = Math.max(0, r.height - 8); w = h * ratio; }
+        let w = Math.max(0, availW), h = w / ratio;
+        if(h > availH){ h = Math.max(0, availH); w = h * ratio; }
         svg.setAttribute('width', Math.max(220, w));
         svg.setAttribute('height', Math.max(160, h));
       }
-      requestAnimationFrame(sizeSvg);
+      requestAnimationFrame(()=>{ sizeSvg(); requestAnimationFrame(sizeSvg); });
       window.addEventListener('resize', sizeSvg);
 
       let selected = COLORS[0].hex;
@@ -1523,11 +1631,262 @@
   };
 
   /* ============================================================
+     GAME 12 — PUZZLE (jigsaw, ported from the standalone puzzle app)
+     ============================================================ */
+  let pzLoadedImg = null; // persists across "Nouveau" so it reshuffles the SAME image
+
+  function pzPt(x1,y1,ux,uy,nx,ny,len,t,off){
+    return { x: x1+ux*len*t+nx*off, y: y1+uy*len*t+ny*off };
+  }
+  function pzDrawEdge(ctx, x1,y1,x2,y2, sign){
+    const dx=x2-x1, dy=y2-y1;
+    const len=Math.hypot(dx,dy);
+    const ux=dx/len, uy=dy/len;
+    const nx=uy, ny=-ux;
+    if(sign===0){ ctx.lineTo(x2,y2); return; }
+    const depth = sign*len*0.24;
+    const n1=0.34, n2=0.66;
+    const p1 = pzPt(x1,y1,ux,uy,nx,ny,len,n1,0);
+    const c1 = pzPt(x1,y1,ux,uy,nx,ny,len,n1,depth*0.7);
+    const c2 = pzPt(x1,y1,ux,uy,nx,ny,len,0.42,depth);
+    const p3 = pzPt(x1,y1,ux,uy,nx,ny,len,0.5,depth);
+    const c3 = pzPt(x1,y1,ux,uy,nx,ny,len,0.58,depth);
+    const c4 = pzPt(x1,y1,ux,uy,nx,ny,len,n2,depth*0.7);
+    const p5 = pzPt(x1,y1,ux,uy,nx,ny,len,n2,0);
+    ctx.lineTo(p1.x,p1.y);
+    ctx.bezierCurveTo(c1.x,c1.y, c2.x,c2.y, p3.x,p3.y);
+    ctx.bezierCurveTo(c3.x,c3.y, c4.x,c4.y, p5.x,p5.y);
+    ctx.lineTo(x2,y2);
+  }
+  function pzComputeTrayScale(fullW, fullH, totalPieces, trayInnerW, trayInnerH, gap){
+    const minScale = 0.16, maxScale = 0.85;
+    function fits(scale){
+      const w = fullW*scale, h = fullH*scale;
+      const perRow = Math.max(1, Math.floor((trayInnerW + gap) / (w + gap)));
+      const rowsNeeded = Math.ceil(totalPieces / perRow);
+      const neededHeight = rowsNeeded * (h + gap);
+      return neededHeight <= trayInnerH + gap && w <= trayInnerW;
+    }
+    if(fits(maxScale)) return maxScale;
+    if(!fits(minScale)) return minScale;
+    let lo = minScale, hi = maxScale;
+    for(let i=0;i<18;i++){
+      const mid = (lo+hi)/2;
+      if(fits(mid)) lo = mid; else hi = mid;
+    }
+    return lo;
+  }
+
+  const gamePuzzle = {
+    id:'puzzle', icon:'🧩', title:'Puzzle', color:'#2E6690', desc:'Assemble les pièces',
+    init(root){
+      const wrap = document.createElement('div');
+      wrap.className = 'game-root';
+      root.appendChild(wrap);
+
+      if(!pzLoadedImg){
+        const chooser = document.createElement('div');
+        chooser.className = 'pz-chooser';
+        chooser.innerHTML = `
+          <div class="game-instructions">Choisis une image pour créer ton puzzle !</div>
+          <label class="pz-chooser-btn" for="pzFileInput">📷 Choisir une image</label>
+          <input type="file" id="pzFileInput" accept="image/*">
+        `;
+        wrap.appendChild(chooser);
+        const input = chooser.querySelector('#pzFileInput');
+        input.addEventListener('change', (e)=>{
+          const file = e.target.files[0];
+          if(!file) return;
+          const reader = new FileReader();
+          reader.onload = (ev)=>{
+            const img = new Image();
+            img.onload = ()=>{
+              pzLoadedImg = img;
+              teardown();
+              activeCleanup = gamePuzzle.init(gameArea) || null;
+            };
+            img.src = ev.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+        return;
+      }
+
+      const instr = document.createElement('div');
+      instr.className = 'game-instructions';
+      instr.innerHTML = 'Glisse les pièces du bac dans le cadre ! &nbsp; <a href="#" id="pzChangeImg" style="color:var(--coral);text-decoration:underline;">Changer d\'image</a>';
+      instr.querySelector('#pzChangeImg').addEventListener('click', (e)=>{
+        e.preventDefault();
+        pzLoadedImg = null;
+        teardown();
+        activeCleanup = gamePuzzle.init(gameArea) || null;
+      });
+      const playArea = document.createElement('div');
+      playArea.className = 'pz-play-area';
+      const frameOuter = document.createElement('div');
+      frameOuter.className = 'pz-frame-outer';
+      const frame = document.createElement('div');
+      frame.className = 'pz-frame';
+      const watermark = document.createElement('img');
+      watermark.className = 'pz-watermark';
+      watermark.alt = '';
+      frame.appendChild(watermark);
+      frameOuter.appendChild(frame);
+      const trayWrap = document.createElement('div');
+      trayWrap.className = 'pz-tray-wrap';
+      const trayLabel = document.createElement('div');
+      trayLabel.className = 'pz-tray-label';
+      trayLabel.textContent = '🧺 Pièces';
+      const tray = document.createElement('div');
+      tray.className = 'pz-tray';
+      trayWrap.appendChild(trayLabel); trayWrap.appendChild(tray);
+      playArea.appendChild(frameOuter); playArea.appendChild(trayWrap);
+      wrap.appendChild(instr); wrap.appendChild(playArea);
+      root.appendChild(wrap);
+
+      const imgW = pzLoadedImg.naturalWidth, imgH = pzLoadedImg.naturalHeight;
+      const aspect = imgW/imgH;
+      const targetPieces = diffN(4, 42);
+      let cols = Math.max(2, Math.round(Math.sqrt(targetPieces*aspect)));
+      let rows = Math.max(2, Math.round(targetPieces/cols));
+
+      const containerW = playArea.getBoundingClientRect().width || gameArea.clientWidth;
+      const gaRect = gameArea.getBoundingClientRect();
+      const stacked = !window.matchMedia('(min-width:701px), (orientation:landscape)').matches;
+      const availH = gaRect.height - instr.getBoundingClientRect().height - 20 - (stacked ? 160 : 0);
+
+      let maxBoardWidth;
+      if(stacked){
+        maxBoardWidth = containerW * 0.92;
+      } else {
+        let trayWidthPx = trayWrap.getBoundingClientRect().width;
+        if(!trayWidthPx || trayWidthPx < 80 || trayWidthPx > containerW*0.6) trayWidthPx = 220;
+        maxBoardWidth = containerW - trayWidthPx - 16 - 8;
+      }
+      maxBoardWidth = Math.max(160, Math.min(maxBoardWidth, 760));
+      const maxBoardHeight = Math.max(160, Math.min(availH, 760));
+
+      const scale = Math.min(maxBoardWidth/imgW, maxBoardHeight/imgH);
+      const boardW = Math.round(imgW*scale), boardH = Math.round(imgH*scale);
+      const pieceW = boardW/cols, pieceH = boardH/rows;
+      const padding = Math.round(Math.max(pieceW,pieceH) * 0.32);
+
+      frame.style.width = boardW+'px';
+      frame.style.height = boardH+'px';
+      trayWrap.style.height = boardH+'px';
+      watermark.src = pzLoadedImg.src;
+      watermark.style.width = boardW+'px';
+      watermark.style.height = boardH+'px';
+
+      for(let r=0;r<rows;r++){
+        for(let c=0;c<cols;c++){
+          const slot = document.createElement('div');
+          slot.className = 'pz-slot';
+          slot.style.left=(c*pieceW)+'px'; slot.style.top=(r*pieceH)+'px';
+          slot.style.width=pieceW+'px'; slot.style.height=pieceH+'px';
+          frame.appendChild(slot);
+        }
+      }
+
+      const vEdge=[], hEdge=[];
+      for(let r=0;r<rows;r++){ vEdge.push([]); for(let c=0;c<cols-1;c++) vEdge[r].push(Math.random()<0.5?1:-1); }
+      for(let r=0;r<rows-1;r++){ hEdge.push([]); for(let c=0;c<cols;c++) hEdge[r].push(Math.random()<0.5?1:-1); }
+
+      const fullW = pieceW+padding*2, fullH = pieceH+padding*2;
+      const totalPieces = cols*rows;
+      const trayInnerW = tray.clientWidth || 180;
+      const trayInnerH = tray.clientHeight || 180;
+      const trayScale = pzComputeTrayScale(fullW, fullH, totalPieces, trayInnerW, trayInnerH, 6);
+
+      function applyTraySizePz(canvas){
+        canvas.style.width = (fullW*trayScale)+'px';
+        canvas.style.height = (fullH*trayScale)+'px';
+      }
+      function applyFullSizePz(canvas){
+        canvas.style.width = fullW+'px';
+        canvas.style.height = fullH+'px';
+      }
+
+      const piecesData = [];
+      let placedCount = 0;
+      const order = [];
+      for(let r=0;r<rows;r++) for(let c=0;c<cols;c++) order.push({r,c});
+      shuffle(order).forEach(({r,c})=>{
+        const top    = (r===0)     ? 0 : -hEdge[r-1][c];
+        const bottom = (r===rows-1)? 0 :  hEdge[r][c];
+        const left   = (c===0)     ? 0 : -vEdge[r][c-1];
+        const right  = (c===cols-1)? 0 :  vEdge[r][c];
+
+        const canvas = document.createElement('canvas');
+        canvas.className = 'pz-piece';
+        canvas.width = fullW; canvas.height = fullH;
+        const ctx = canvas.getContext('2d');
+        const x0=padding, y0=padding;
+        ctx.beginPath(); ctx.moveTo(x0,y0);
+        pzDrawEdge(ctx,x0,y0,x0+pieceW,y0,top);
+        pzDrawEdge(ctx,x0+pieceW,y0,x0+pieceW,y0+pieceH,right);
+        pzDrawEdge(ctx,x0+pieceW,y0+pieceH,x0,y0+pieceH,bottom);
+        pzDrawEdge(ctx,x0,y0+pieceH,x0,y0,left);
+        ctx.closePath();
+        ctx.save(); ctx.clip();
+        ctx.drawImage(pzLoadedImg, -(c*pieceW)+padding, -(r*pieceH)+padding, boardW, boardH);
+        ctx.restore();
+        ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(21,54,80,0.4)'; ctx.stroke();
+
+        canvas.dataset.correctRow=r; canvas.dataset.correctCol=c; canvas.dataset.placed='0';
+        tray.appendChild(canvas);
+        applyTraySizePz(canvas);
+        piecesData.push(canvas);
+
+        makeSimpleDraggable(canvas, {
+          onPick(){ applyFullSizePz(canvas); },
+          onDrop(cx, cy){
+            const frameRect = frame.getBoundingClientRect();
+            const inside = cx>=frameRect.left && cx<=frameRect.right && cy>=frameRect.top && cy<=frameRect.bottom;
+            if(inside){
+              const localX = cx-frameRect.left, localY = cy-frameRect.top;
+              let col = Math.max(0, Math.min(cols-1, Math.floor(localX/pieceW)));
+              let row = Math.max(0, Math.min(rows-1, Math.floor(localY/pieceH)));
+              const occupied = piecesData.some(p=> p!==canvas && p.dataset.placed==='1' &&
+                parseInt(p.dataset.placedRow)===row && parseInt(p.dataset.placedCol)===col);
+              if(!occupied){
+                canvas.style.position='absolute';
+                canvas.classList.add('in-frame');
+                frame.appendChild(canvas);
+                canvas.style.left=(col*pieceW-padding)+'px';
+                canvas.style.top=(row*pieceH-padding)+'px';
+                canvas.style.width=fullW+'px'; canvas.style.height=fullH+'px';
+                canvas.dataset.placed='1'; canvas.dataset.placedRow=row; canvas.dataset.placedCol=col;
+                const correct = row===parseInt(canvas.dataset.correctRow) && col===parseInt(canvas.dataset.correctCol);
+                canvas.classList.toggle('placed-correct', correct);
+                soundPop();
+                placedCount++;
+                if(piecesData.every(p=>p.dataset.placed==='1') &&
+                   piecesData.every(p=> p.dataset.placedRow===p.dataset.correctRow && p.dataset.placedCol===p.dataset.correctCol)){
+                  setTimeout(celebrate, 200);
+                }
+                return true;
+              }
+            }
+            canvas.style.position='static';
+            canvas.classList.remove('in-frame');
+            canvas.classList.remove('placed-correct');
+            canvas.dataset.placed='0';
+            tray.appendChild(canvas);
+            applyTraySizePz(canvas);
+            return true; // we handled repositioning ourselves either way
+          }
+        });
+      });
+    }
+  };
+
+  /* ============================================================
      REGISTER GAMES + BUILD HOME GRID
      ============================================================ */
   const GAMES = [
     gameMemory, gameShapes, gameBubbles, gameCount, gameColoring,
-    gameAnimals, gameColorHunt, gameShadows, gameDots, gameDress, gameSort
+    gameAnimals, gameColorHunt, gameShadows, gameDots, gameDress, gameSort, gamePuzzle
   ];
 
   GAMES.forEach(game=>{
