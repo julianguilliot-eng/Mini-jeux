@@ -54,7 +54,8 @@
   }
   #fullscreenBtnHome{
     position:absolute;
-    top:16px; right:16px;
+    top:max(16px, env(safe-area-inset-top));
+    right:16px;
     z-index:5;
   }
   #homeHeader{
@@ -90,18 +91,18 @@
     flex-direction:column;
     align-items:center;
     justify-content:center;
-    gap:6px;
+    gap:8px;
     border-radius:20px;
     color:white;
     font-weight:700;
-    font-size:clamp(12px,1.6vw,15px);
+    font-size:clamp(15px,2.6vmin,22px);
     text-align:center;
     padding:8px;
     box-shadow:0 6px 0 rgba(0,0,0,0.18);
     transition:transform .08s ease;
   }
   .game-card:active{ transform:translateY(4px); box-shadow:0 2px 0 rgba(0,0,0,0.18); }
-  .game-card .ic{ font-size:clamp(30px,4.5vw,46px); }
+  .game-card .ic{ font-size:clamp(42px,7vmin,68px); }
 
   /* ---------- GAME SCREEN SHELL ---------- */
   #screenGame.active{
@@ -116,31 +117,36 @@
     flex:0 0 auto;
     display:flex;
     align-items:center;
-    justify-content:space-between;
-    gap:8px;
-    padding:10px 12px 10px 56px;
+    justify-content:center;
+    padding:max(14px, env(safe-area-inset-top)) 70px 4px;
   }
   .topbar .tb-title{
     font-weight:700;
     font-size:clamp(16px,3vw,24px);
     color:var(--wood-2);
     text-align:center;
-    flex:1;
   }
   .topbar-right{ display:flex; gap:6px; }
 
-  .diffbar{
+  .controlbar{
     flex:0 0 auto;
     display:flex;
     align-items:center;
-    justify-content:center;
+    justify-content:space-between;
     gap:10px;
-    padding:0 16px 8px;
+    padding:6px 16px 10px;
+  }
+  .diff-group{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex:1;
+    justify-content:center;
+    min-width:0;
   }
   .diffbar-label{
     font-weight:700;
-    font-size:13px;
-    color:var(--wood-2);
+    font-size:15px;
     white-space:nowrap;
   }
   .diffbar-value{
@@ -153,9 +159,15 @@
     min-width:22px;
     text-align:center;
   }
-  #diffSlider{
-    width:min(220px, 40vw);
-    accent-color:var(--coral);
+  /* Custom slider (no native <input type=range>, avoids the iOS fullscreen
+     "text input" security prompt some Safari versions show for form controls) */
+  .cslider{ width:min(200px, 34vw); padding:14px 0; touch-action:none; cursor:pointer; }
+  .cslider-track{ position:relative; height:6px; border-radius:4px; background:rgba(21,54,80,0.2); }
+  .cslider-fill{ position:absolute; top:0; left:0; height:100%; border-radius:4px; background:var(--coral); }
+  .cslider-tick{ position:absolute; top:50%; width:4px; height:4px; margin-left:-2px; margin-top:-2px; border-radius:50%; background:rgba(21,54,80,0.35); }
+  .cslider-thumb{
+    position:absolute; top:50%; width:26px; height:26px; margin-left:-13px; margin-top:-13px;
+    border-radius:50%; background:var(--coral); box-shadow:0 3px 0 var(--coral-dark);
   }
   .tb-btn{
     border-radius:14px;
@@ -335,6 +347,29 @@
   .animal-btn:active{ transform:translateY(4px); box-shadow:0 1px 0 rgba(21,54,80,0.25); }
   .animal-btn.bounce{ animation:abounce .5s ease; }
   @keyframes abounce{ 0%,100%{transform:scale(1);} 40%{transform:scale(1.25);} }
+  .animal-btn.placed-correct-anim{ box-shadow:0 0 0 4px var(--teal), 0 5px 0 rgba(21,54,80,0.25); }
+
+  #findStage{ display:flex; flex-direction:column; gap:16px; width:100%; height:100%; align-items:center; justify-content:center; }
+  #findPlayRow{ flex:0 0 auto; display:flex; align-items:center; gap:16px; }
+  #findPlayBtn{
+    width:clamp(70px,15vmin,110px); height:clamp(70px,15vmin,110px);
+    border-radius:50%;
+    background:var(--coral);
+    color:white;
+    font-size:clamp(28px,7vmin,46px);
+    box-shadow:0 6px 0 var(--coral-dark);
+  }
+  #findPlayBtn:active{ transform:translateY(4px); box-shadow:0 1px 0 var(--coral-dark); }
+  #findTargetLabel{
+    font-family:'Fredoka',sans-serif;
+    font-weight:700;
+    font-size:clamp(22px,5vmin,38px);
+    color:var(--wood-2);
+    background:rgba(255,255,255,0.6);
+    padding:8px 22px;
+    border-radius:16px;
+  }
+  #findStage #animalGrid{ flex:1 1 auto; min-height:0; }
 
   /* ================= COLOR HUNT ================= */
   #colorHuntTarget{ font-size:clamp(90px,24vmin,190px); }
@@ -402,17 +437,20 @@
   /* ================= DRESS UP ================= */
   #dressStage{ position:relative; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; }
   #dressCanvas{ position:relative; flex:1 1 auto; min-height:0; width:100%; display:flex; align-items:center; justify-content:center; }
-  #dressBase{ font-size:clamp(140px,34vmin,280px); }
+  #dressBase{ font-size:clamp(140px,34vmin,280px); transition:transform .15s ease; }
+  #dressBase.pop-swap{ animation:dressPop .3s ease; }
+  @keyframes dressPop{ 0%{transform:scale(0.7);} 60%{transform:scale(1.12);} 100%{transform:scale(1);} }
   #dressStickers{ display:flex; gap:16px; flex:0 0 auto; flex-wrap:wrap; justify-content:center; min-height:clamp(64px,14vmin,96px); align-items:center; }
   .sticker{
     font-size:clamp(46px,11vmin,72px);
-    touch-action:none;
     cursor:grab;
+    touch-action:none;
+    -webkit-user-select:none; user-select:none; -webkit-touch-callout:none;
     background:rgba(255,255,255,0.5);
     border-radius:14px;
-    padding:4px;
+    padding:8px;
   }
-  .sticker.placed-on-canvas{ position:absolute; z-index:5; background:none; }
+  .sticker:active{ transform:scale(0.9); }
 
   /* ================= SORT (fruits/veg) ================= */
   #sortStage{ display:flex; flex-direction:column; gap:28px; width:100%; height:100%; align-items:center; justify-content:center; }
@@ -522,17 +560,29 @@
 
 <div id="screenGame" class="screen">
   <div class="topbar">
-    <button class="tb-btn ghost" id="backBtn">← Accueil</button>
     <span class="tb-title" id="gameTitle">Jeu</span>
+  </div>
+  <div class="controlbar">
+    <button class="tb-btn ghost" id="backBtn">← Accueil</button>
+    <div class="diff-group">
+      <span class="diffbar-label">🎚️</span>
+      <div class="cslider" id="diffSlider">
+        <div class="cslider-track">
+          <div class="cslider-fill" id="diffFill"></div>
+          <div class="cslider-tick" style="left:0%"></div>
+          <div class="cslider-tick" style="left:25%"></div>
+          <div class="cslider-tick" style="left:50%"></div>
+          <div class="cslider-tick" style="left:75%"></div>
+          <div class="cslider-tick" style="left:100%"></div>
+          <div class="cslider-thumb" id="diffThumb"></div>
+        </div>
+      </div>
+      <span class="diffbar-value" id="diffValue">2</span>
+    </div>
     <div class="topbar-right">
       <button class="tb-btn icon ghost" id="fullscreenBtn" title="Plein écran">⛶</button>
       <button class="tb-btn" id="newBtn">🔀 Nouveau</button>
     </div>
-  </div>
-  <div class="diffbar">
-    <span class="diffbar-label">🎚️ Difficulté</span>
-    <input type="range" id="diffSlider" min="1" max="5" step="1" value="2">
-    <span class="diffbar-value" id="diffValue">2</span>
   </div>
   <div id="gameArea"></div>
 </div>
@@ -749,20 +799,44 @@
     return Math.round(lo + (hi-lo)*t);
   }
   const diffSlider = document.getElementById('diffSlider');
+  const diffTrack = diffSlider.querySelector('.cslider-track');
+  const diffThumb = document.getElementById('diffThumb');
+  const diffFill = document.getElementById('diffFill');
   const diffValue = document.getElementById('diffValue');
-  function syncDiffSliderToCurrentGame(){
-    const v = curDifficulty();
-    diffSlider.value = v;
+
+  function setDiffVisual(v){
+    const pct = ((v-1)/4)*100;
+    diffThumb.style.left = pct+'%';
+    diffFill.style.width = pct+'%';
     diffValue.textContent = v;
   }
-  diffSlider.addEventListener('input', ()=>{
+  function syncDiffSliderToCurrentGame(){
+    setDiffVisual(curDifficulty());
+  }
+  function commitDiff(v){
     if(!currentGame) return;
-    const v = parseInt(diffSlider.value,10);
+    v = Math.max(1, Math.min(5, v));
+    if(gameDifficultyById[currentGame.id] === v) return;
     gameDifficultyById[currentGame.id] = v;
-    diffValue.textContent = v;
+    setDiffVisual(v);
     teardown();
     activeCleanup = currentGame.init(gameArea) || null;
-  });
+  }
+  function diffValueFromClientX(clientX){
+    const r = diffTrack.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(1, (clientX-r.left)/r.width));
+    return Math.round(pct*4)+1;
+  }
+  let diffDragging = false;
+  function diffDown(clientX){ diffDragging = true; commitDiff(diffValueFromClientX(clientX)); }
+  function diffMove(clientX){ if(diffDragging) commitDiff(diffValueFromClientX(clientX)); }
+  function diffUp(){ diffDragging = false; }
+  diffSlider.addEventListener('mousedown', (e)=>{ diffDown(e.clientX); e.preventDefault(); });
+  diffSlider.addEventListener('touchstart', (e)=>{ diffDown(e.touches[0].clientX); if(e.cancelable) e.preventDefault(); }, {passive:false});
+  window.addEventListener('mousemove', (e)=> diffMove(e.clientX));
+  window.addEventListener('touchmove', (e)=>{ if(diffDragging){ diffMove(e.touches[0].clientX); if(e.cancelable) e.preventDefault(); } }, {passive:false});
+  window.addEventListener('mouseup', diffUp);
+  window.addEventListener('touchend', diffUp);
 
   /* ============================================================
      Generic drag helper: makes an element draggable (mouse+touch),
@@ -774,19 +848,22 @@
 
     function down(clientX, clientY){
       dragging = true;
-      const rect = el.getBoundingClientRect();
-      offsetX = clientX - rect.left;
-      offsetY = clientY - rect.top;
+      const rect0 = el.getBoundingClientRect();
       startParent = el.parentElement;
       startNext = el.nextSibling;
-      el.style.width = rect.width+'px';
-      el.style.height = rect.height+'px';
+      el.style.width = rect0.width+'px';
+      el.style.height = rect0.height+'px';
       el.style.position = 'fixed';
-      el.style.left = rect.left+'px';
-      el.style.top = rect.top+'px';
+      el.style.left = rect0.left+'px';
+      el.style.top = rect0.top+'px';
       el.style.zIndex = 999;
       document.body.appendChild(el);
-      if(opts.onPick) opts.onPick();
+      if(opts.onPick) opts.onPick(); // may resize el (e.g. grow to full size)
+      const rect = el.getBoundingClientRect();
+      offsetX = rect.width/2;
+      offsetY = rect.height/2;
+      el.style.left = (clientX-offsetX)+'px';
+      el.style.top = (clientY-offsetY)+'px';
     }
     function move(clientX, clientY){
       if(!dragging) return;
@@ -982,6 +1059,24 @@
           }
         });
       });
+
+      // Force everything to fit on a single row (never wrap), so the shapes
+      // can never grow tall enough to overlap the control bar above.
+      function fitRowSize(){
+        const availW = stage.getBoundingClientRect().width || slotsRow.getBoundingClientRect().width;
+        const gap = 20;
+        const raw = Math.floor((availW - (n-1)*gap) / n);
+        const size = Math.max(46, Math.min(150, raw));
+        const fontSize = Math.round(size*0.52);
+        [...slotsRow.querySelectorAll('.shape-slot'), ...tray.querySelectorAll('.shape-piece')].forEach(el=>{
+          el.style.width = size+'px';
+          el.style.height = size+'px';
+          el.style.fontSize = fontSize+'px';
+        });
+      }
+      requestAnimationFrame(fitRowSize);
+      window.addEventListener('resize', fitRowSize);
+      return function cleanup(){ window.removeEventListener('resize', fitRowSize); };
     }
   };
 
@@ -1151,6 +1246,44 @@
         addRect(svg,95,125,30,30,'win1');
         addRect(svg,175,125,30,30,'win2');
       }
+    },
+    { name:'Papillon', viewBox:'65 25 170 115', build(svg){
+        addEllipse(svg,110,60,35,25,'w1',-20);
+        addEllipse(svg,190,60,35,25,'w2',20);
+        addEllipse(svg,115,110,28,20,'w3',-15);
+        addEllipse(svg,185,110,28,20,'w4',15);
+        addRect(svg,147,40,6,95,'body');
+      }
+    },
+    { name:'Bateau', viewBox:'50 50 200 140', build(svg){
+        addPath(svg,'M60,150 L240,150 L200,180 L100,180 Z','hull');
+        addRect(svg,145,60,8,90,'mast');
+        addPath(svg,'M153,65 L153,130 L212,130 Z','sail');
+      }
+    },
+    { name:'Arbre', viewBox:'60 45 170 175', build(svg){
+        addRect(svg,140,140,20,70,'trunk');
+        addCircle(svg,115,130,35,'leaf1');
+        addCircle(svg,185,130,35,'leaf2');
+        addCircle(svg,150,95,45,'leaf3');
+      }
+    },
+    { name:'Voiture', viewBox:'40 60 230 113', build(svg){
+        addPath(svg,'M50,120 L60,90 L100,90 L110,70 L190,70 L200,90 L250,90 L260,120 L260,140 L50,140 Z','body');
+        addRect(svg,110,75,70,25,'window');
+        addCircle(svg,90,145,18,'wheel1');
+        addCircle(svg,220,145,18,'wheel2');
+      }
+    },
+    { name:'Château', viewBox:'50 40 200 170', build(svg){
+        addRect(svg,90,110,120,90,'wall');
+        addRect(svg,60,80,40,120,'towerL');
+        addRect(svg,200,80,40,120,'towerR');
+        addPath(svg,'M60,80 L80,50 L100,80 Z','roofL');
+        addPath(svg,'M200,80 L220,50 L240,80 Z','roofR');
+        addRect(svg,135,150,30,50,'door');
+        addRect(svg,145,115,10,15,'win');
+      }
     }
   ];
   function addPath(svg,d,id){ const p=document.createElementNS('http://www.w3.org/2000/svg','path'); p.setAttribute('d',d); p.setAttribute('fill','#ffffff'); p.setAttribute('data-region',id); svg.appendChild(p); }
@@ -1225,6 +1358,22 @@
   /* ============================================================
      GAME 6 — ANIMAL SOUNDS (says the animal's name aloud)
      ============================================================ */
+  const ANIMAL_NAMES = {
+    '🐶':'Le chien','🐱':'Le chat','🐭':'La souris','🐰':'Le lapin','🦊':'Le renard',
+    '🐻':'L\'ours','🐼':'Le panda','🐨':'Le koala','🐯':'Le tigre','🦁':'Le lion',
+    '🐷':'Le cochon','🐸':'La grenouille','🐄':'La vache','🐑':'Le mouton','🐔':'La poule',
+    '🐴':'Le cheval','🐐':'La chèvre','🦆':'Le canard','🐘':'L\'éléphant','🦒':'La girafe',
+    '🦓':'Le zèbre','🐍':'Le serpent','🦜':'Le perroquet','🐊':'Le crocodile','🦍':'Le gorille',
+    '🐳':'La baleine','🐬':'Le dauphin','🐠':'Le poisson','🐡':'Le poisson-globe','🦀':'Le crabe',
+    '🐙':'La pieuvre','🦑':'Le calamar','🦈':'Le requin','🐢':'La tortue','🦞':'Le homard',
+    '🐕':'Le chien'
+  };
+  const ANIMAL_CRY_KIND = {
+    '🐶':'dog','🐕':'dog','🐱':'cat','🐄':'cow','🐑':'sheep','🐐':'sheep',
+    '🦆':'duck','🐴':'horse','🐷':'pig','🐸':'frog',
+    '🐻':'roar','🐯':'roar','🦁':'roar'
+  };
+
   const gameAnimals = {
     id:'animals', icon:'🐮', title:'Qui est-ce ?', color:'#F2C230', desc:'Touche et écoute',
     init(root){
@@ -1241,22 +1390,6 @@
       wrap.appendChild(instr); wrap.appendChild(stage);
       root.appendChild(wrap);
 
-      const NAMES = {
-        '🐶':'Le chien','🐱':'Le chat','🐭':'La souris','🐰':'Le lapin','🦊':'Le renard',
-        '🐻':'L\'ours','🐼':'Le panda','🐨':'Le koala','🐯':'Le tigre','🦁':'Le lion',
-        '🐷':'Le cochon','🐸':'La grenouille','🐄':'La vache','🐑':'Le mouton','🐔':'La poule',
-        '🐴':'Le cheval','🐐':'La chèvre','🦆':'Le canard','🐘':'L\'éléphant','🦒':'La girafe',
-        '🦓':'Le zèbre','🐍':'Le serpent','🦜':'Le perroquet','🐊':'Le crocodile','🦍':'Le gorille',
-        '🐳':'La baleine','🐬':'Le dauphin','🐠':'Le poisson','🐡':'Le poisson-globe','🦀':'Le crabe',
-        '🐙':'La pieuvre','🦑':'Le calamar','🦈':'Le requin','🐢':'La tortue','🦞':'Le homard',
-        '🐕':'Le chien'
-      };
-      const CRY_KIND = {
-        '🐶':'dog','🐕':'dog','🐱':'cat','🐄':'cow','🐑':'sheep','🐐':'sheep',
-        '🦆':'duck','🐴':'horse','🐷':'pig','🐸':'frog',
-        '🐻':'roar','🐯':'roar','🦁':'roar'
-      };
-
       const themeKey = rand(['ferme','jungle','ocean','animaux']);
       const count = Math.min(diffN(3,8), SETS[themeKey].length);
       const chosen = pickN(SETS[themeKey], count);
@@ -1272,9 +1405,75 @@
           btn.classList.remove('bounce');
           void btn.offsetWidth;
           btn.classList.add('bounce');
-          const kind = CRY_KIND[emoji];
+          const kind = ANIMAL_CRY_KIND[emoji];
           if(kind) playCrySound(kind);
-          say(NAMES[emoji] || 'L\'animal');
+          say(ANIMAL_NAMES[emoji] || 'L\'animal');
+        });
+        grid.appendChild(btn);
+      });
+    }
+  };
+
+  /* ============================================================
+     GAME — FIND THE ANIMAL (play a name, find the matching tile)
+     ============================================================ */
+  const gameFindAnimal = {
+    id:'findanimal', icon:'🔍', title:'Trouve l\'animal', color:'#1F6B60', desc:'Écoute et trouve le bon animal',
+    init(root){
+      const wrap = document.createElement('div');
+      wrap.className = 'game-root';
+      const instr = document.createElement('div');
+      instr.className = 'game-instructions';
+      instr.textContent = 'Appuie sur ▶️, puis trouve le bon animal !';
+      const stage = document.createElement('div');
+      stage.id = 'findStage';
+      const playRow = document.createElement('div');
+      playRow.id = 'findPlayRow';
+      const playBtn = document.createElement('button');
+      playBtn.id = 'findPlayBtn';
+      playBtn.textContent = '▶️';
+      const targetLabel = document.createElement('div');
+      targetLabel.id = 'findTargetLabel';
+      targetLabel.textContent = '?';
+      playRow.appendChild(playBtn); playRow.appendChild(targetLabel);
+      const grid = document.createElement('div');
+      grid.id = 'animalGrid';
+      stage.appendChild(playRow); stage.appendChild(grid);
+      wrap.appendChild(instr); wrap.appendChild(stage);
+      root.appendChild(wrap);
+
+      const themeKey = rand(['ferme','jungle','ocean','animaux']);
+      const count = Math.min(diffN(3,8), SETS[themeKey].length);
+      const chosen = pickN(SETS[themeKey], count);
+      const target = rand(chosen);
+      const {cols, rows} = gridDims(chosen.length);
+      grid.style.gridTemplateColumns = `repeat(${cols},1fr)`;
+      grid.style.gridTemplateRows = `repeat(${rows},1fr)`;
+
+      function announce(){
+        targetLabel.textContent = ANIMAL_NAMES[target] || 'L\'animal';
+        const kind = ANIMAL_CRY_KIND[target];
+        if(kind) playCrySound(kind);
+        say('Trouve : ' + (ANIMAL_NAMES[target] || 'l\'animal'));
+      }
+      playBtn.addEventListener('click', announce);
+      announce();
+
+      let answered = false;
+      chosen.forEach(emoji=>{
+        const btn = document.createElement('div');
+        btn.className = 'animal-btn';
+        btn.textContent = emoji;
+        btn.addEventListener('click', ()=>{
+          if(answered) return;
+          if(emoji === target){
+            answered = true;
+            btn.classList.add('placed-correct-anim');
+            celebrate();
+          } else {
+            soundOops();
+            btn.classList.remove('bounce'); void btn.offsetWidth; btn.classList.add('bounce');
+          }
         });
         grid.appendChild(btn);
       });
@@ -1433,7 +1632,6 @@
       const leftOrder = shuffle(items);
       const rightOrder = shuffle(items);
 
-      let selectedLeft = null;
       const matched = new Set();
       const btnsLeft = {}, btnsRight = {};
 
@@ -1470,35 +1668,58 @@
         svgLayer.appendChild(line);
       }
 
-      Object.values(btnsLeft).forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          if(matched.has(btn.dataset.em)) return;
-          Object.values(btnsLeft).forEach(x=>x.classList.remove('selected'));
-          selectedLeft = btn;
+      let selected = null; // { btn, side: 'left'|'right' }
+
+      function clearSelection(){
+        Object.values(btnsLeft).forEach(x=>x.classList.remove('selected'));
+        Object.values(btnsRight).forEach(x=>x.classList.remove('selected'));
+        selected = null;
+      }
+
+      function handleClick(btn, side){
+        if(matched.has(btn.dataset.em)) return;
+
+        if(!selected){
+          clearSelection();
+          selected = { btn, side };
           btn.classList.add('selected');
           soundPop();
-        });
+          return;
+        }
+
+        if(selected.side === side){
+          // picking a different item on the SAME side just changes the selection
+          clearSelection();
+          selected = { btn, side };
+          btn.classList.add('selected');
+          soundPop();
+          return;
+        }
+
+        // opposite side tapped: try to match
+        if(selected.btn.dataset.em === btn.dataset.em){
+          matched.add(btn.dataset.em);
+          selected.btn.classList.remove('selected');
+          selected.btn.classList.add('matched');
+          btn.classList.add('matched');
+          drawLine(selected.btn, btn);
+          soundPop();
+          selected = null;
+          if(matched.size === items.length) setTimeout(celebrate, 200);
+        } else {
+          soundOops();
+          btn.classList.add('shake');
+          setTimeout(()=> btn.classList.remove('shake'), 300);
+        }
+      }
+
+      Object.values(btnsLeft).forEach(btn=>{
         btn.dataset.em = btn.textContent;
+        btn.addEventListener('click', ()=> handleClick(btn, 'left'));
       });
       Object.values(btnsRight).forEach(btn=>{
         btn.dataset.em = btn.textContent;
-        btn.addEventListener('click', ()=>{
-          if(!selectedLeft || matched.has(btn.dataset.em)) return;
-          if(selectedLeft.dataset.em === btn.dataset.em){
-            matched.add(btn.dataset.em);
-            selectedLeft.classList.remove('selected');
-            selectedLeft.classList.add('matched');
-            btn.classList.add('matched');
-            drawLine(selectedLeft, btn);
-            soundPop();
-            selectedLeft = null;
-            if(matched.size === items.length) setTimeout(celebrate, 200);
-          } else {
-            soundOops();
-            btn.classList.add('shake');
-            setTimeout(()=> btn.classList.remove('shake'), 300);
-          }
-        });
+        btn.addEventListener('click', ()=> handleClick(btn, 'right'));
       });
 
       window.addEventListener('resize', resizeSvg);
@@ -1510,20 +1731,40 @@
      GAME 10 — DRESS UP (creative, no wrong answer)
      ============================================================ */
   const DRESS_THEMES = [
-    { label:'Habille le bonhomme', base:'🧑', stickers:['🎩','👓','🧣','🕶️','👑','🎀'] },
-    { label:'Décore la maison', base:'🏠', stickers:['🌸','🌳','☀️','🌈','🐦','🎈'] },
-    { label:'Habille le bonhomme de neige', base:'⛄', stickers:['🧣','🎩','🥕','⭐','🧤'] },
-    { label:'Décore le sapin', base:'🎄', stickers:['⭐','🎀','🎁','🔴','💫'] }
+    { label:'Habille le bonhomme !', base:'😐',
+      options:[
+        {icon:'😐', name:'visage nu', result:'😐'},
+        {icon:'👓', name:'lunettes', result:'🤓'},
+        {icon:'🕶️', name:'lunettes de soleil', result:'😎'},
+        {icon:'🎉', name:'fête', result:'🥳'},
+        {icon:'🤠', name:'chapeau cowboy', result:'🤠'},
+        {icon:'🎅', name:'père Noël', result:'🎅'},
+        {icon:'🤡', name:'clown', result:'🤡'},
+        {icon:'👽', name:'extraterrestre', result:'👽'}
+      ]
+    },
+    { label:'Change l\'humeur du chat !', base:'😺',
+      options:[
+        {icon:'😺', name:'normal', result:'😺'},
+        {icon:'😸', name:'joyeux', result:'😸'},
+        {icon:'😹', name:'rigolo', result:'😹'},
+        {icon:'😻', name:'amoureux', result:'😻'},
+        {icon:'😼', name:'malicieux', result:'😼'},
+        {icon:'😿', name:'triste', result:'😿'},
+        {icon:'😾', name:'fâché', result:'😾'},
+        {icon:'🙀', name:'surpris', result:'🙀'}
+      ]
+    }
   ];
   const gameDress = {
-    id:'dress', icon:'🎩', title:'Décore-moi', color:'#C0568F', desc:'Habille et décore',
+    id:'dress', icon:'🎩', title:'Décore-moi', color:'#C0568F', desc:'Glisse un accessoire, le dessin change !',
     init(root){
       const wrap = document.createElement('div');
       wrap.className = 'game-root';
       const theme = rand(DRESS_THEMES);
       const instr = document.createElement('div');
       instr.className = 'game-instructions';
-      instr.textContent = theme.label + ' !';
+      instr.textContent = 'Glisse un accessoire sur le personnage !';
       const stage = document.createElement('div');
       stage.id = 'dressStage';
       const canvas = document.createElement('div');
@@ -1532,33 +1773,32 @@
       base.id = 'dressBase';
       base.textContent = theme.base;
       canvas.appendChild(base);
-      const stickerRow = document.createElement('div');
-      stickerRow.id = 'dressStickers';
-      stage.appendChild(canvas); stage.appendChild(stickerRow);
+      const optionRow = document.createElement('div');
+      optionRow.id = 'dressStickers';
+      stage.appendChild(canvas); stage.appendChild(optionRow);
       wrap.appendChild(instr); wrap.appendChild(stage);
       root.appendChild(wrap);
 
-      const chosen = pickN(theme.stickers, Math.min(diffN(3,6), theme.stickers.length));
-      chosen.forEach(em=>{
-        const s = document.createElement('div');
-        s.className = 'sticker';
-        s.textContent = em;
-        stickerRow.appendChild(s);
-        makeSimpleDraggable(s, {
+      const chosen = [theme.options[0], ...pickN(theme.options.slice(1), Math.min(diffN(3,7), theme.options.length-1))];
+      chosen.forEach(opt=>{
+        const chip = document.createElement('div');
+        chip.className = 'sticker';
+        chip.title = opt.name;
+        chip.textContent = opt.icon;
+        optionRow.appendChild(chip);
+
+        makeSimpleDraggable(chip, {
           onDrop(cx, cy){
             const r = canvas.getBoundingClientRect();
-            if(cx>=r.left && cx<=r.right && cy>=r.top && cy<=r.bottom){
-              const sRect = s.getBoundingClientRect();
-              s.style.position = 'absolute';
-              s.style.left = (cx-r.left-sRect.width/2)+'px';
-              s.style.top = (cy-r.top-sRect.height/2)+'px';
-              s.style.width=''; s.style.height='';
-              s.classList.add('placed-on-canvas');
-              canvas.appendChild(s);
+            const nearCanvas = cx>=r.left-30 && cx<=r.right+30 && cy>=r.top-30 && cy<=r.bottom+30;
+            if(nearCanvas){
+              base.textContent = opt.result;
+              base.classList.remove('pop-swap');
+              void base.offsetWidth;
+              base.classList.add('pop-swap');
               soundPop();
-              return true;
             }
-            return false;
+            return false; // the chip always snaps back to the tray, ready to try again
           }
         });
       });
@@ -1886,7 +2126,7 @@
      ============================================================ */
   const GAMES = [
     gameMemory, gameShapes, gameBubbles, gameCount, gameColoring,
-    gameAnimals, gameColorHunt, gameShadows, gameDots, gameDress, gameSort, gamePuzzle
+    gameAnimals, gameFindAnimal, gameColorHunt, gameShadows, gameDots, gameDress, gameSort, gamePuzzle
   ];
 
   GAMES.forEach(game=>{
