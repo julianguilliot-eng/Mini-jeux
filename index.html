@@ -111,7 +111,7 @@
     align-items:center;
     justify-content:space-between;
     gap:8px;
-    padding:10px 12px;
+    padding:10px 12px 10px 56px;
   }
   .topbar .tb-title{
     font-weight:700;
@@ -121,6 +121,35 @@
     flex:1;
   }
   .topbar-right{ display:flex; gap:6px; }
+
+  .diffbar{
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    padding:0 16px 8px;
+  }
+  .diffbar-label{
+    font-weight:700;
+    font-size:13px;
+    color:var(--wood-2);
+    white-space:nowrap;
+  }
+  .diffbar-value{
+    font-weight:700;
+    font-size:14px;
+    color:white;
+    background:var(--teal);
+    border-radius:10px;
+    padding:2px 10px;
+    min-width:22px;
+    text-align:center;
+  }
+  #diffSlider{
+    width:min(220px, 40vw);
+    accent-color:var(--coral);
+  }
   .tb-btn{
     border-radius:14px;
     padding:9px 14px;
@@ -210,7 +239,7 @@
     background:linear-gradient(155deg,var(--wood-1),var(--wood-2));
     box-shadow:0 4px 0 rgba(0,0,0,0.2);
     display:flex; align-items:center; justify-content:center;
-    font-size:clamp(30px,9vmin,68px);
+    font-size:clamp(34px,11vmin,84px);
     transition:transform .25s;
     transform-style:preserve-3d;
   }
@@ -219,35 +248,27 @@
   .mem-card.flipped .face-back, .mem-card.matched .face-back{ display:flex; }
   .mem-card:not(.flipped):not(.matched) .face-front{ display:flex; }
   .face{ width:100%; height:100%; align-items:center; justify-content:center; }
-  .face-front{ color:rgba(255,255,255,0.65); font-size:clamp(22px,5vmin,36px); }
+  .face-front{ color:rgba(255,255,255,0.65); font-size:clamp(24px,6vmin,42px); }
   .mem-card.matched{ background:rgba(255,255,255,0.5); box-shadow:0 0 0 3px var(--teal) inset; }
 
   /* ================= SHAPE SORTER ================= */
-  #shapeStage{ display:flex; flex-direction:column; gap:20px; width:100%; height:100%; align-items:center; justify-content:center; }
-  #shapeSlots{ display:flex; gap:16px; flex-wrap:wrap; align-items:center; justify-content:center; }
+  #shapeStage{ display:flex; flex-direction:column; gap:26px; width:100%; height:100%; align-items:center; justify-content:center; }
+  #shapeSlots{ display:flex; gap:20px; flex-wrap:wrap; align-items:center; justify-content:center; }
   .shape-slot{
-    width:clamp(76px,16vmin,130px); height:clamp(76px,16vmin,130px);
-    border-radius:18px;
-    background:rgba(255,255,255,0.5);
-    box-shadow:inset 0 0 0 4px rgba(21,54,80,0.3);
+    width:clamp(90px,18vmin,150px); height:clamp(90px,18vmin,150px);
     display:flex; align-items:center; justify-content:center;
     position:relative;
-    font-size:clamp(38px,9vmin,64px);
-    overflow:hidden;
+    font-size:clamp(46px,11vmin,80px);
   }
-  .slot-hint{ opacity:0.32; pointer-events:none; }
+  .slot-hint{ filter:brightness(0); opacity:0.88; pointer-events:none; }
   .shape-slot[data-filled] .slot-hint{ display:none; }
-  .shape-slot[data-filled]{ box-shadow:inset 0 0 0 4px var(--teal); }
-  #shapeTray{ display:flex; gap:16px; flex-wrap:wrap; align-items:center; justify-content:center; }
+  #shapeTray{ display:flex; gap:20px; flex-wrap:wrap; align-items:center; justify-content:center; }
   .shape-piece{
-    width:clamp(76px,16vmin,130px); height:clamp(76px,16vmin,130px);
+    width:clamp(90px,18vmin,150px); height:clamp(90px,18vmin,150px);
     display:flex; align-items:center; justify-content:center;
-    background:rgba(255,255,255,0.6);
-    border-radius:18px;
-    box-shadow:0 5px 0 rgba(0,0,0,0.2);
     touch-action:none;
     cursor:grab;
-    font-size:clamp(38px,9vmin,64px);
+    font-size:clamp(46px,11vmin,80px);
   }
 
   /* ================= BUBBLES ================= */
@@ -265,14 +286,14 @@
   .bubble.pop{ transform:scale(1.6); opacity:0; }
 
   /* ================= COUNT ================= */
-  #countRow{ display:flex; gap:14px; flex-wrap:wrap; align-items:center; justify-content:center; font-size:clamp(40px,10vmin,76px); }
+  #countRow{ display:flex; gap:16px; flex-wrap:wrap; align-items:center; justify-content:center; font-size:clamp(46px,13vmin,96px); }
   #countChoices{ display:flex; gap:16px; }
   .count-btn{
-    width:clamp(78px,14vmin,120px); height:clamp(78px,14vmin,120px);
-    border-radius:20px;
+    width:clamp(90px,17vmin,150px); height:clamp(90px,17vmin,150px);
+    border-radius:22px;
     background:var(--coral);
     color:white;
-    font-size:clamp(30px,7vmin,46px);
+    font-size:clamp(36px,9vmin,58px);
     font-weight:700;
     box-shadow:0 6px 0 var(--coral-dark);
   }
@@ -302,36 +323,36 @@
     background:var(--panel);
     box-shadow:0 5px 0 rgba(21,54,80,0.25);
     display:flex; align-items:center; justify-content:center;
-    font-size:clamp(40px,11vmin,88px);
+    font-size:clamp(46px,13vmin,108px);
   }
   .animal-btn:active{ transform:translateY(4px); box-shadow:0 1px 0 rgba(21,54,80,0.25); }
   .animal-btn.bounce{ animation:abounce .5s ease; }
   @keyframes abounce{ 0%,100%{transform:scale(1);} 40%{transform:scale(1.25);} }
 
   /* ================= COLOR HUNT ================= */
-  #colorHuntTarget{ font-size:clamp(80px,20vmin,160px); }
+  #colorHuntTarget{ font-size:clamp(90px,24vmin,190px); }
   #colorHuntOptions{ display:flex; gap:18px; flex-wrap:wrap; justify-content:center; }
   .ch-opt{
-    width:clamp(84px,16vmin,130px); height:clamp(84px,16vmin,130px);
-    border-radius:20px;
+    width:clamp(100px,19vmin,160px); height:clamp(100px,19vmin,160px);
+    border-radius:22px;
     background:var(--panel);
     box-shadow:0 6px 0 rgba(21,54,80,0.25);
     display:flex; align-items:center; justify-content:center;
-    font-size:clamp(36px,9vmin,62px);
+    font-size:clamp(42px,11vmin,74px);
   }
   .ch-opt:active{ transform:translateY(4px); box-shadow:0 1px 0 rgba(21,54,80,0.25); }
 
   /* ================= SHADOWS ================= */
-  #shadowTargetWrap{ font-size:clamp(70px,17vmin,130px); }
+  #shadowTargetWrap{ font-size:clamp(84px,21vmin,160px); }
   #shadowOptions{ display:flex; gap:18px; }
   .shadow-opt{
-    font-size:clamp(60px,15vmin,110px);
+    font-size:clamp(72px,18vmin,130px);
     filter:brightness(0);
     opacity:0.85;
   }
   .shadow-opt-wrap{
-    width:clamp(90px,20vmin,150px); height:clamp(90px,20vmin,150px);
-    border-radius:20px;
+    width:clamp(108px,24vmin,180px); height:clamp(108px,24vmin,180px);
+    border-radius:22px;
     background:var(--panel);
     box-shadow:0 6px 0 rgba(21,54,80,0.25);
     display:flex; align-items:center; justify-content:center;
@@ -357,12 +378,12 @@
     align-items:center;
   }
   .match-btn{
-    width:clamp(64px,13vmin,100px); height:clamp(64px,13vmin,100px);
-    border-radius:18px;
+    width:clamp(78px,16vmin,124px); height:clamp(78px,16vmin,124px);
+    border-radius:20px;
     background:var(--panel);
-    box-shadow:0 5px 0 rgba(21,54,80,0.25);
+    box-shadow:0 6px 0 rgba(21,54,80,0.25);
     display:flex; align-items:center; justify-content:center;
-    font-size:clamp(30px,8vmin,54px);
+    font-size:clamp(36px,10vmin,66px);
     cursor:pointer;
   }
   .match-btn:active{ transform:translateY(3px); }
@@ -374,7 +395,7 @@
   /* ================= DRESS UP ================= */
   #dressStage{ position:relative; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; }
   #dressCanvas{ position:relative; flex:1 1 auto; min-height:0; width:100%; display:flex; align-items:center; justify-content:center; }
-  #dressBase{ font-size:clamp(90px,20vmin,150px); }
+  #dressBase{ font-size:clamp(140px,34vmin,280px); }
   #dressStickers{ display:flex; gap:16px; flex:0 0 auto; flex-wrap:wrap; justify-content:center; }
   .sticker{
     font-size:clamp(46px,11vmin,72px);
@@ -387,22 +408,22 @@
   .sticker.placed-on-canvas{ position:absolute; z-index:5; background:none; }
 
   /* ================= SORT (fruits/veg) ================= */
-  #sortStage{ display:flex; flex-direction:column; gap:14px; width:100%; height:100%; align-items:center; justify-content:center; }
-  #sortBaskets{ display:flex; gap:24px; }
+  #sortStage{ display:flex; flex-direction:column; gap:28px; width:100%; height:100%; align-items:center; justify-content:center; }
+  #sortBaskets{ display:flex; gap:40px; }
   .basket{
-    width:clamp(110px,20vmin,170px); height:clamp(88px,16vmin,135px);
-    border-radius:16px 16px 24px 24px;
+    width:clamp(140px,26vmin,220px); height:clamp(110px,20vmin,175px);
+    border-radius:20px 20px 30px 30px;
     background:rgba(255,255,255,0.5);
-    border:3px dashed rgba(21,54,80,0.35);
+    border:4px dashed rgba(21,54,80,0.35);
     display:flex; flex-direction:column; align-items:center; justify-content:center;
-    font-size:clamp(13px,2.6vmin,17px);
+    font-size:clamp(15px,3vmin,20px);
     font-weight:700;
-    gap:4px;
+    gap:6px;
   }
-  .basket .ic{ font-size:clamp(32px,7vmin,52px); }
-  #sortTray{ display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
+  .basket .ic{ font-size:clamp(42px,9vmin,68px); }
+  #sortTray{ display:flex; gap:18px; flex-wrap:wrap; justify-content:center; }
   .sort-item{
-    font-size:clamp(38px,9vmin,64px);
+    font-size:clamp(50px,12vmin,84px);
     touch-action:none;
     cursor:grab;
   }
@@ -427,9 +448,13 @@
     <span class="tb-title" id="gameTitle">Jeu</span>
     <div class="topbar-right">
       <button class="tb-btn icon ghost" id="fullscreenBtn" title="Plein écran">⛶</button>
-      <button class="tb-btn ghost" id="diffBtn" title="Régler la difficulté">🎚️ 2</button>
       <button class="tb-btn" id="newBtn">🔀 Nouveau</button>
     </div>
+  </div>
+  <div class="diffbar">
+    <span class="diffbar-label">🎚️ Difficulté</span>
+    <input type="range" id="diffSlider" min="1" max="5" step="1" value="2">
+    <span class="diffbar-value" id="diffValue">2</span>
   </div>
   <div id="gameArea"></div>
 </div>
@@ -465,22 +490,60 @@
 
   // ---- tiny synthesized sound effects (no audio files needed) ----
   let audioCtx = null;
+  function ensureAudio(){
+    if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  }
   function beep(freq, dur, type){
     try{
-      if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
+      const ctx = ensureAudio();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
       osc.type = type||'sine';
       osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + (dur||0.2));
-      osc.connect(gain); gain.connect(audioCtx.destination);
-      osc.start(); osc.stop(audioCtx.currentTime + (dur||0.2));
+      const t0 = ctx.currentTime;
+      gain.gain.setValueAtTime(0.0001, t0);
+      gain.gain.exponentialRampToValueAtTime(0.35, t0+0.012);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t0 + (dur||0.2));
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(t0); osc.stop(t0 + (dur||0.2) + 0.03);
     }catch(err){ /* ignore */ }
   }
-  function soundPop(){ beep(520,0.12,'triangle'); }
+  function soundPop(){ beep(700,0.1,'triangle'); setTimeout(()=>beep(950,0.09,'triangle'),35); }
   function soundGood(){ beep(660,0.12,'sine'); setTimeout(()=>beep(880,0.18,'sine'),110); }
   function soundOops(){ beep(180,0.18,'sawtooth'); }
+
+  // ---- synthesized animal cries (no audio files, no onomatopoeia text) ----
+  function playCrySound(kind){
+    try{
+      const ctx = ensureAudio();
+      const t0 = ctx.currentTime;
+      function tone(f1, f2, dur, type, offset, vol){
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(f1, t0+offset);
+        osc.frequency.linearRampToValueAtTime(f2, t0+offset+dur);
+        gain.gain.setValueAtTime(0.0001, t0+offset);
+        gain.gain.exponentialRampToValueAtTime(vol||0.3, t0+offset+0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t0+offset+dur);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(t0+offset); osc.stop(t0+offset+dur+0.05);
+      }
+      switch(kind){
+        case 'dog': tone(320,220,0.12,'sawtooth',0,0.3); tone(320,220,0.12,'sawtooth',0.17,0.3); break;
+        case 'cat': tone(420,750,0.16,'sine',0,0.28); tone(750,430,0.18,'sine',0.17,0.24); break;
+        case 'cow': tone(95,120,0.55,'sawtooth',0,0.32); break;
+        case 'sheep': tone(320,380,0.14,'sawtooth',0,0.28); tone(320,270,0.16,'sawtooth',0.17,0.26); break;
+        case 'duck': tone(520,470,0.09,'square',0,0.22); tone(520,470,0.09,'square',0.14,0.22); break;
+        case 'horse': tone(220,520,0.25,'sawtooth',0,0.3); tone(500,320,0.22,'sawtooth',0.26,0.24); break;
+        case 'pig': tone(160,120,0.1,'sawtooth',0,0.28); tone(160,120,0.1,'sawtooth',0.13,0.28); tone(160,105,0.14,'sawtooth',0.27,0.28); break;
+        case 'frog': tone(220,150,0.12,'sawtooth',0,0.28); break;
+        case 'roar': tone(70,95,0.5,'sawtooth',0,0.35); break;
+      }
+    }catch(err){ /* ignore */ }
+  }
 
   function warmUpAudio(){
     try{
@@ -547,6 +610,7 @@
     gameTitle.textContent = game.icon + ' ' + game.title;
     screenHome.classList.remove('active');
     screenGame.classList.add('active');
+    syncDiffSliderToCurrentGame();
     warmUpAudio();
     teardown();
     requestAnimationFrame(()=>{ activeCleanup = game.init(gameArea) || null; });
@@ -581,20 +645,31 @@
     return { cols, rows: Math.ceil(n/cols) };
   }
 
-  // ---- shared difficulty (1..5), used by every game to scale item counts ----
-  let DIFFICULTY = 2;
+  // ---- per-game difficulty (1..5) — each game remembers its own level ----
+  const gameDifficultyById = {};
+  function curDifficulty(){
+    if(!currentGame) return 2;
+    if(gameDifficultyById[currentGame.id] === undefined) gameDifficultyById[currentGame.id] = 2;
+    return gameDifficultyById[currentGame.id];
+  }
   function diffN(lo, hi){
-    const t = (DIFFICULTY-1)/4;
+    const t = (curDifficulty()-1)/4;
     return Math.round(lo + (hi-lo)*t);
   }
-  const diffBtn = document.getElementById('diffBtn');
-  function updateDiffBtn(){ diffBtn.textContent = '🎚️ ' + DIFFICULTY; }
-  updateDiffBtn();
-  diffBtn.addEventListener('click', ()=>{
-    DIFFICULTY = DIFFICULTY >= 5 ? 1 : DIFFICULTY + 1;
-    updateDiffBtn();
-    showToast('Niveau ' + DIFFICULTY, 700);
-    if(currentGame){ teardown(); activeCleanup = currentGame.init(gameArea) || null; }
+  const diffSlider = document.getElementById('diffSlider');
+  const diffValue = document.getElementById('diffValue');
+  function syncDiffSliderToCurrentGame(){
+    const v = curDifficulty();
+    diffSlider.value = v;
+    diffValue.textContent = v;
+  }
+  diffSlider.addEventListener('input', ()=>{
+    if(!currentGame) return;
+    const v = parseInt(diffSlider.value,10);
+    gameDifficultyById[currentGame.id] = v;
+    diffValue.textContent = v;
+    teardown();
+    activeCleanup = currentGame.init(gameArea) || null;
   });
 
   /* ============================================================
@@ -935,7 +1010,7 @@
      GAME 5 — COLORING
      ============================================================ */
   const COLORING_TEMPLATES = [
-    { name:'Soleil', build(svg){
+    { name:'Soleil', viewBox:'65 10 170 100', build(svg){
         addPath(svg,'M150,60 L165,20 L175,62 Z','r1');
         addPath(svg,'M150,60 L195,35 L182,72 Z','r2');
         addPath(svg,'M150,60 L225,60 L188,80 Z','r3');
@@ -949,7 +1024,7 @@
         addCircle(svg,150,60,32,'center');
       }
     },
-    { name:'Fleur', build(svg){
+    { name:'Fleur', viewBox:'74 14 152 206', build(svg){
         addEllipse(svg,150,50,26,18,'p1');
         addEllipse(svg,190,80,26,18,'p2',45);
         addEllipse(svg,178,125,26,18,'p3',110);
@@ -959,13 +1034,13 @@
         addRect(svg,145,150,10,60,'stem');
       }
     },
-    { name:'Poisson', build(svg){
+    { name:'Poisson', viewBox:'50 40 200 100', build(svg){
         addEllipse(svg,130,90,70,40,'body');
         addPath(svg,'M195,90 L240,60 L240,120 Z','tail');
         addCircle(svg,90,80,8,'eye');
       }
     },
-    { name:'Maison', build(svg){
+    { name:'Maison', viewBox:'60 30 180 180', build(svg){
         addRect(svg,80,110,140,90,'wall');
         addPath(svg,'M70,110 L150,40 L230,110 Z','roof');
         addRect(svg,135,150,30,50,'door');
@@ -999,13 +1074,14 @@
 
       const tpl = rand(COLORING_TEMPLATES);
       const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
-      svg.setAttribute('viewBox','0 0 300 220');
+      const vb = (tpl.viewBox || '0 0 300 220').split(' ').map(Number);
+      svg.setAttribute('viewBox', tpl.viewBox || '0 0 300 220');
       tpl.build(svg);
       svgWrap.appendChild(svg);
 
       function sizeSvg(){
         const r = svgWrap.getBoundingClientRect();
-        const ratio = 300/220;
+        const ratio = vb[2]/vb[3];
         let w = Math.max(0, r.width - 8), h = w / ratio;
         if(h > r.height - 8){ h = Math.max(0, r.height - 8); w = h * ratio; }
         svg.setAttribute('width', Math.max(220, w));
@@ -1067,11 +1143,10 @@
         '🐙':'La pieuvre','🦑':'Le calamar','🦈':'Le requin','🐢':'La tortue','🦞':'Le homard',
         '🐕':'Le chien'
       };
-      const CRIES = {
-        '🐶':'Wouf wouf','🐕':'Wouf wouf','🐱':'Miaou','🐭':'Couic couic',
-        '🐻':'Grrrr','🐯':'Grrrr','🐷':'Groin groin','🐸':'Coa coa',
-        '🐄':'Meuh','🐑':'Bêêê','🐐':'Bêêê','🐔':'Cot cot codet',
-        '🐴':'Hiiiii','🦆':'Coin coin','🐍':'Sssssss','🦁':'Rrrrho'
+      const CRY_KIND = {
+        '🐶':'dog','🐕':'dog','🐱':'cat','🐄':'cow','🐑':'sheep','🐐':'sheep',
+        '🦆':'duck','🐴':'horse','🐷':'pig','🐸':'frog',
+        '🐻':'roar','🐯':'roar','🦁':'roar'
       };
 
       const themeKey = rand(['ferme','jungle','ocean','animaux']);
@@ -1089,9 +1164,9 @@
           btn.classList.remove('bounce');
           void btn.offsetWidth;
           btn.classList.add('bounce');
-          const name = NAMES[emoji] || 'L\'animal';
-          const cry = CRIES[emoji];
-          say(cry ? `${name} fait ${cry} !` : name);
+          const kind = CRY_KIND[emoji];
+          if(kind) playCrySound(kind);
+          say(NAMES[emoji] || 'L\'animal');
         });
         grid.appendChild(btn);
       });
@@ -1326,23 +1401,28 @@
   /* ============================================================
      GAME 10 — DRESS UP (creative, no wrong answer)
      ============================================================ */
-  const DRESS_BASES = ['😀','🐶','🐱','🐻','🧸'];
-  const STICKERS = ['🎩','👓','🎀','🌸','👑','🦋','⭐','❤️','🎈'];
+  const DRESS_THEMES = [
+    { label:'Habille le bonhomme', base:'🧑', stickers:['🎩','👓','🧣','🕶️','👑','🎀'] },
+    { label:'Décore la maison', base:'🏠', stickers:['🌸','🌳','☀️','🌈','🐦','🎈'] },
+    { label:'Habille le bonhomme de neige', base:'⛄', stickers:['🧣','🎩','🥕','⭐','🧤'] },
+    { label:'Décore le sapin', base:'🎄', stickers:['⭐','🎀','🎁','🔴','💫'] }
+  ];
   const gameDress = {
-    id:'dress', icon:'🎩', title:'Décore-moi', color:'#C0568F', desc:'Amuse-toi à décorer',
+    id:'dress', icon:'🎩', title:'Décore-moi', color:'#C0568F', desc:'Habille et décore',
     init(root){
       const wrap = document.createElement('div');
       wrap.className = 'game-root';
+      const theme = rand(DRESS_THEMES);
       const instr = document.createElement('div');
       instr.className = 'game-instructions';
-      instr.textContent = 'Glisse les objets pour décorer le personnage !';
+      instr.textContent = theme.label + ' !';
       const stage = document.createElement('div');
       stage.id = 'dressStage';
       const canvas = document.createElement('div');
       canvas.id = 'dressCanvas';
       const base = document.createElement('div');
       base.id = 'dressBase';
-      base.textContent = rand(DRESS_BASES);
+      base.textContent = theme.base;
       canvas.appendChild(base);
       const stickerRow = document.createElement('div');
       stickerRow.id = 'dressStickers';
@@ -1350,7 +1430,7 @@
       wrap.appendChild(instr); wrap.appendChild(stage);
       root.appendChild(wrap);
 
-      const chosen = pickN(STICKERS, diffN(3,7));
+      const chosen = pickN(theme.stickers, Math.min(diffN(3,6), theme.stickers.length));
       chosen.forEach(em=>{
         const s = document.createElement('div');
         s.className = 'sticker';
