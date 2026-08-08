@@ -144,6 +144,7 @@
     justify-content:center;
     min-width:0;
   }
+  .diff-group.hidden{ visibility:hidden; }
   .diffbar-label{
     font-weight:700;
     font-size:15px;
@@ -319,16 +320,41 @@
   .count-btn:active{ transform:translateY(4px); box-shadow:0 1px 0 var(--coral-dark); }
 
   /* ================= COLORING ================= */
-  #colorStage{ display:flex; flex-direction:column; align-items:center; gap:14px; width:100%; height:100%; justify-content:center; }
-  #colorSvgWrap{ flex:1 1 auto; min-height:0; display:flex; align-items:center; justify-content:center; }
+  #colorStage{ display:flex; gap:12px; width:100%; height:100%; align-items:stretch; }
+  #colorPicker{
+    flex:0 0 auto;
+    width:clamp(52px,9vmin,72px);
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    padding:4px;
+    background:rgba(255,255,255,0.4);
+    border-radius:14px;
+  }
+  .tpl-thumb{
+    flex:0 0 auto;
+    width:100%;
+    aspect-ratio:1;
+    border-radius:12px;
+    background:var(--panel);
+    box-shadow:0 3px 0 rgba(21,54,80,0.25);
+    display:flex; align-items:center; justify-content:center;
+    font-size:clamp(20px,4vmin,30px);
+    cursor:pointer;
+  }
+  .tpl-thumb.active{ box-shadow:0 0 0 3px var(--coral), 0 3px 0 rgba(21,54,80,0.25); }
+  #colorMainCol{ flex:1 1 auto; min-width:0; display:flex; flex-direction:column; align-items:center; gap:12px; justify-content:center; }
+  #colorSvgWrap{ flex:1 1 auto; min-height:0; width:100%; display:flex; align-items:center; justify-content:center; }
   #colorSvgWrap svg{ max-width:100%; max-height:100%; }
   #colorSvgWrap path, #colorSvgWrap ellipse, #colorSvgWrap circle, #colorSvgWrap polygon, #colorSvgWrap rect{
     cursor:pointer;
     stroke:#22303c; stroke-width:3;
   }
-  #palette{ display:flex; gap:10px; flex:0 0 auto; flex-wrap:wrap; justify-content:center; }
+  #palette{ display:flex; gap:8px; flex:0 0 auto; flex-wrap:wrap; justify-content:center; max-width:100%; }
   .swatch{
-    width:clamp(46px,8vmin,60px); height:clamp(46px,8vmin,60px);
+    width:clamp(32px,6vmin,42px); height:clamp(32px,6vmin,42px);
     border-radius:50%;
     box-shadow:0 3px 0 rgba(0,0,0,0.2);
     border:3px solid white;
@@ -784,13 +810,13 @@
     gameTitle.textContent = game.icon + ' ' + game.title;
     screenHome.classList.remove('active');
     screenGame.classList.add('active');
+    document.querySelector('.diff-group').classList.toggle('hidden', !!game.noDifficulty);
     syncDiffSliderToCurrentGame();
     warmUpAudio();
     teardown();
     requestAnimationFrame(()=>{ activeCleanup = game.init(gameArea) || null; });
   }
   backBtn.addEventListener('click', ()=>{
-    if(fsElement()) exitFs();
     teardown();
     screenGame.classList.remove('active');
     screenHome.classList.add('active');
@@ -945,6 +971,13 @@
     {name:'orange', hex:'#F0872E'},
     {name:'violet', hex:'#8B5FBF'},
     {name:'rose', hex:'#EE6FA6'}
+  ];
+
+  const COLORING_PALETTE = [
+    '#E5473B','#B71C1C','#F0872E','#F2C230','#FFE082',
+    '#8BC34A','#3EA35C','#00897B','#26A69A','#4FC3F7',
+    '#3B7DE5','#3F51B5','#5C6BC0','#8B5FBF','#AB47BC',
+    '#EE6FA6','#D6409F','#8B5A2B','#9AA5B1','#2B2B2B','#FFFFFF'
   ];
 
   /* ============================================================
@@ -1241,7 +1274,7 @@
      GAME 5 — COLORING
      ============================================================ */
   const COLORING_TEMPLATES = [
-    { name:'Soleil', viewBox:'65 10 170 100', build(svg){
+    { name:'Soleil', icon:'☀️', viewBox:'65 10 170 100', build(svg){
         addPath(svg,'M150,60 L165,20 L175,62 Z','r1');
         addPath(svg,'M150,60 L195,35 L182,72 Z','r2');
         addPath(svg,'M150,60 L225,60 L188,80 Z','r3');
@@ -1255,7 +1288,7 @@
         addCircle(svg,150,60,32,'center');
       }
     },
-    { name:'Fleur', viewBox:'74 14 152 206', build(svg){
+    { name:'Fleur', icon:'🌸', viewBox:'74 14 152 206', build(svg){
         addEllipse(svg,150,50,26,18,'p1');
         addEllipse(svg,190,80,26,18,'p2',45);
         addEllipse(svg,178,125,26,18,'p3',110);
@@ -1265,13 +1298,13 @@
         addRect(svg,145,150,10,60,'stem');
       }
     },
-    { name:'Poisson', viewBox:'50 40 200 100', build(svg){
+    { name:'Poisson', icon:'🐟', viewBox:'50 40 200 100', build(svg){
         addEllipse(svg,130,90,70,40,'body');
         addPath(svg,'M195,90 L240,60 L240,120 Z','tail');
         addCircle(svg,90,80,8,'eye');
       }
     },
-    { name:'Maison', viewBox:'60 30 180 180', build(svg){
+    { name:'Maison', icon:'🏠', viewBox:'60 30 180 180', build(svg){
         addRect(svg,80,110,140,90,'wall');
         addPath(svg,'M70,110 L150,40 L230,110 Z','roof');
         addRect(svg,135,150,30,50,'door');
@@ -1279,7 +1312,7 @@
         addRect(svg,175,125,30,30,'win2');
       }
     },
-    { name:'Papillon', viewBox:'65 25 170 115', build(svg){
+    { name:'Papillon', icon:'🦋', viewBox:'65 25 170 115', build(svg){
         addEllipse(svg,110,60,35,25,'w1',-20);
         addEllipse(svg,190,60,35,25,'w2',20);
         addEllipse(svg,115,110,28,20,'w3',-15);
@@ -1287,27 +1320,27 @@
         addRect(svg,147,40,6,95,'body');
       }
     },
-    { name:'Bateau', viewBox:'50 50 200 140', build(svg){
+    { name:'Bateau', icon:'⛵', viewBox:'50 50 200 140', build(svg){
         addPath(svg,'M60,150 L240,150 L200,180 L100,180 Z','hull');
         addRect(svg,145,60,8,90,'mast');
         addPath(svg,'M153,65 L153,130 L212,130 Z','sail');
       }
     },
-    { name:'Arbre', viewBox:'60 45 170 175', build(svg){
+    { name:'Arbre', icon:'🌳', viewBox:'60 45 170 175', build(svg){
         addRect(svg,140,140,20,70,'trunk');
         addCircle(svg,115,130,35,'leaf1');
         addCircle(svg,185,130,35,'leaf2');
         addCircle(svg,150,95,45,'leaf3');
       }
     },
-    { name:'Voiture', viewBox:'40 60 230 113', build(svg){
+    { name:'Voiture', icon:'🚗', viewBox:'40 60 230 113', build(svg){
         addPath(svg,'M50,120 L60,90 L100,90 L110,70 L190,70 L200,90 L250,90 L260,120 L260,140 L50,140 Z','body');
         addRect(svg,110,75,70,25,'window');
         addCircle(svg,90,145,18,'wheel1');
         addCircle(svg,220,145,18,'wheel2');
       }
     },
-    { name:'Château', viewBox:'50 40 200 170', build(svg){
+    { name:'Château', icon:'🏰', viewBox:'50 40 200 170', build(svg){
         addRect(svg,90,110,120,90,'wall');
         addRect(svg,60,80,40,120,'towerL');
         addRect(svg,200,80,40,120,'towerR');
@@ -1315,6 +1348,107 @@
         addPath(svg,'M200,80 L220,50 L240,80 Z','roofR');
         addRect(svg,135,150,30,50,'door');
         addRect(svg,145,115,10,15,'win');
+      }
+    },
+    { name:'Étoile', icon:'⭐', viewBox:'57 40 186 178', build(svg){
+        addPath(svg,'M150,50 L169,110 L233,110 L181,148 L200,208 L150,170 L100,208 L119,148 L67,110 L131,110 Z','star');
+      }
+    },
+    { name:'Cœur', icon:'❤️', viewBox:'50 25 200 175', build(svg){
+        addPath(svg,'M150,190 C110,150 60,120 60,85 C60,55 85,35 110,35 C130,35 145,50 150,65 C155,50 170,35 190,35 C215,35 240,55 240,85 C240,120 190,150 150,190 Z','heart');
+      }
+    },
+    { name:'Ballon', icon:'🎈', viewBox:'85 25 130 225', build(svg){
+        addEllipse(svg,150,100,55,65,'body');
+        addPath(svg,'M150,165 L140,180 L160,180 Z','knot');
+        addRect(svg,148,180,4,60,'string');
+      }
+    },
+    { name:'Cerf-volant', icon:'🪁', viewBox:'80 30 140 265', build(svg){
+        addPath(svg,'M150,40 L210,130 L150,220 L90,130 Z','kite');
+        addRect(svg,148,220,4,20,'string1');
+        addPath(svg,'M150,240 L142,248 L150,256 L158,248 Z','bow1');
+        addPath(svg,'M150,260 L142,268 L150,276 L158,268 Z','bow2');
+      }
+    },
+    { name:'Parapluie', icon:'☂️', viewBox:'50 40 200 210', build(svg){
+        addPath(svg,'M60,140 A90,90 0 0 1 240,140 Z','canopy');
+        addRect(svg,146,140,8,70,'handle');
+        addPath(svg,'M150,210 Q150,230 170,225 Q178,213 162,213 Z','hook');
+      }
+    },
+    { name:'Glace', icon:'🍦', viewBox:'105 60 90 180', build(svg){
+        addPath(svg,'M120,150 L180,150 L150,230 Z','cone');
+        addCircle(svg,150,130,35,'scoop1');
+        addCircle(svg,150,95,25,'scoop2');
+      }
+    },
+    { name:'Gâteau', icon:'🎂', viewBox:'65 60 170 170', build(svg){
+        addRect(svg,80,150,140,70,'base');
+        addRect(svg,75,135,150,20,'frosting');
+        addRect(svg,145,90,10,45,'candle');
+        addPath(svg,'M150,70 Q158,85 150,90 Q142,85 150,70 Z','flame');
+      }
+    },
+    { name:'Cadeau', icon:'🎁', viewBox:'60 65 180 165', build(svg){
+        addRect(svg,70,110,160,110,'box');
+        addRect(svg,140,110,20,110,'ribbonV');
+        addRect(svg,70,150,160,20,'ribbonH');
+        addPath(svg,'M150,110 Q110,80 90,100 Q100,120 150,110 Z','bowL');
+        addPath(svg,'M150,110 Q190,80 210,100 Q200,120 150,110 Z','bowR');
+        addCircle(svg,150,108,8,'bowCenter');
+      }
+    },
+    { name:'Pomme', icon:'🍎', viewBox:'65 60 185 175', build(svg){
+        addEllipse(svg,150,155,75,70,'body');
+        addRect(svg,145,75,8,25,'stem');
+        addEllipse(svg,170,80,18,10,'leaf',-30);
+      }
+    },
+    { name:'Fraise', icon:'🍓', viewBox:'70 65 160 175', build(svg){
+        addPath(svg,'M150,230 C100,200 80,150 100,110 C115,80 185,80 200,110 C220,150 200,200 150,230 Z','body');
+        addPath(svg,'M120,95 L150,75 L180,95 L165,100 L150,90 L135,100 Z','leaves');
+      }
+    },
+    { name:'Oiseau', icon:'🐦', viewBox:'30 80 215 135', build(svg){
+        addEllipse(svg,140,160,60,45,'body');
+        addCircle(svg,90,120,30,'head');
+        addPath(svg,'M62,120 L40,128 L62,136 Z','beak');
+        addEllipse(svg,150,165,35,22,'wing',-20);
+        addPath(svg,'M195,150 L235,130 L235,170 Z','tail');
+      }
+    },
+    { name:'Escargot', icon:'🐌', viewBox:'50 65 190 175', build(svg){
+        addPath(svg,'M70,210 Q60,180 90,170 L200,170 Q230,180 220,210 Q150,230 70,210 Z','body');
+        addCircle(svg,160,130,55,'shellOuter');
+        addCircle(svg,160,130,35,'shellMid');
+        addCircle(svg,160,130,15,'shellInner');
+        addRect(svg,75,150,6,25,'stalk1');
+        addRect(svg,95,145,6,30,'stalk2');
+      }
+    },
+    { name:'Fusée', icon:'🚀', viewBox:'85 40 130 220', build(svg){
+        addRect(svg,125,100,50,120,'body');
+        addPath(svg,'M125,100 Q150,50 175,100 Z','nose');
+        addPath(svg,'M125,190 L95,230 L125,220 Z','finL');
+        addPath(svg,'M175,190 L205,230 L175,220 Z','finR');
+        addCircle(svg,150,140,15,'window');
+        addPath(svg,'M135,220 L150,250 L165,220 Z','flame');
+      }
+    },
+    { name:'Nuage', icon:'☁️', viewBox:'50 65 185 145', build(svg){
+        addPath(svg,'M90,150 Q60,150 60,125 Q60,100 90,100 Q95,75 125,75 Q150,75 160,95 Q185,90 200,110 Q225,110 225,135 Q225,155 200,155 L90,155 Z','cloud');
+        addPath(svg,'M110,170 Q115,185 110,195 Q105,185 110,170 Z','drop1');
+        addPath(svg,'M150,175 Q155,190 150,200 Q145,190 150,175 Z','drop2');
+        addPath(svg,'M190,170 Q195,185 190,195 Q185,185 190,170 Z','drop3');
+      }
+    },
+    { name:'Champignon', icon:'🍄', viewBox:'60 50 180 160', build(svg){
+        addPath(svg,'M70,120 Q70,60 150,60 Q230,60 230,120 Z','cap');
+        addRect(svg,120,120,60,80,'stem');
+        addCircle(svg,110,90,12,'spot1');
+        addCircle(svg,160,80,14,'spot2');
+        addCircle(svg,195,100,10,'spot3');
       }
     }
   ];
@@ -1325,6 +1459,7 @@
 
   const gameColoring = {
     id:'coloring', icon:'🎨', title:'Coloriage', color:'#EE6FA6', desc:'Colorie le dessin',
+    noDifficulty: true,
     init(root){
       const wrap = document.createElement('div');
       wrap.className = 'game-root';
@@ -1333,56 +1468,79 @@
       instr.textContent = 'Choisis une couleur, puis touche le dessin !';
       const stage = document.createElement('div');
       stage.id = 'colorStage';
+      const picker = document.createElement('div');
+      picker.id = 'colorPicker';
+      const mainCol = document.createElement('div');
+      mainCol.id = 'colorMainCol';
       const svgWrap = document.createElement('div');
       svgWrap.id = 'colorSvgWrap';
       const palette = document.createElement('div');
       palette.id = 'palette';
-      stage.appendChild(svgWrap); stage.appendChild(palette);
+      mainCol.appendChild(svgWrap); mainCol.appendChild(palette);
+      stage.appendChild(picker); stage.appendChild(mainCol);
       wrap.appendChild(instr); wrap.appendChild(stage);
       root.appendChild(wrap);
 
-      const tpl = rand(COLORING_TEMPLATES);
-      const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
-      const vb = (tpl.viewBox || '0 0 300 220').split(' ').map(Number);
-      svg.setAttribute('viewBox', tpl.viewBox || '0 0 300 220');
-      tpl.build(svg);
-      svgWrap.appendChild(svg);
+      let currentTpl = null;
+      let svg = null, vb = null;
 
       function sizeSvg(){
+        if(!svg) return;
         const gaRect = gameArea.getBoundingClientRect();
         const instrH = instr.getBoundingClientRect().height;
         const paletteH = palette.getBoundingClientRect().height;
-        const availW = gaRect.width - 24;
+        const availW = svgWrap.getBoundingClientRect().width - 16;
         const availH = gaRect.height - instrH - paletteH - 40;
         const ratio = vb[2]/vb[3];
         let w = Math.max(0, availW), h = w / ratio;
         if(h > availH){ h = Math.max(0, availH); w = h * ratio; }
-        svg.setAttribute('width', Math.max(220, w));
-        svg.setAttribute('height', Math.max(160, h));
+        svg.setAttribute('width', Math.max(180, w));
+        svg.setAttribute('height', Math.max(140, h));
       }
-      requestAnimationFrame(()=>{ sizeSvg(); requestAnimationFrame(sizeSvg); });
-      window.addEventListener('resize', sizeSvg);
 
-      let selected = COLORS[0].hex;
-      COLORS.forEach((c,i)=>{
+      function loadTemplate(tpl){
+        currentTpl = tpl;
+        svgWrap.innerHTML = '';
+        svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+        vb = tpl.viewBox.split(' ').map(Number);
+        svg.setAttribute('viewBox', tpl.viewBox);
+        tpl.build(svg);
+        svgWrap.appendChild(svg);
+        svg.querySelectorAll('[data-region]').forEach(region=>{
+          region.addEventListener('click', ()=>{
+            region.setAttribute('fill', selectedColor);
+            soundPop();
+          });
+        });
+        picker.querySelectorAll('.tpl-thumb').forEach(t=> t.classList.toggle('active', t.dataset.name===tpl.name));
+        requestAnimationFrame(()=>{ sizeSvg(); requestAnimationFrame(sizeSvg); });
+      }
+
+      COLORING_TEMPLATES.forEach(tpl=>{
+        const thumb = document.createElement('div');
+        thumb.className = 'tpl-thumb';
+        thumb.dataset.name = tpl.name;
+        thumb.textContent = tpl.icon;
+        thumb.title = tpl.name;
+        thumb.addEventListener('click', ()=> loadTemplate(tpl));
+        picker.appendChild(thumb);
+      });
+
+      let selectedColor = COLORING_PALETTE[0];
+      COLORING_PALETTE.forEach((hex,i)=>{
         const sw = document.createElement('div');
         sw.className = 'swatch' + (i===0?' selected':'');
-        sw.style.background = c.hex;
+        sw.style.background = hex;
         sw.addEventListener('click', ()=>{
-          selected = c.hex;
+          selectedColor = hex;
           palette.querySelectorAll('.swatch').forEach(s=>s.classList.remove('selected'));
           sw.classList.add('selected');
         });
         palette.appendChild(sw);
       });
 
-      svg.querySelectorAll('[data-region]').forEach(region=>{
-        region.addEventListener('click', ()=>{
-          region.setAttribute('fill', selected);
-          soundPop();
-        });
-      });
-
+      loadTemplate(rand(COLORING_TEMPLATES));
+      window.addEventListener('resize', sizeSvg);
       return function cleanup(){ window.removeEventListener('resize', sizeSvg); };
     }
   };
@@ -1498,10 +1656,8 @@
       let answered = false;
       const tileEls = {};
       newRoundBtn.addEventListener('click', ()=>{
-        Object.values(tileEls).forEach(el=> el.classList.remove('placed-correct-anim'));
-        target = rand(chosen);
-        answered = false;
-        announce();
+        teardown();
+        activeCleanup = gameFindAnimal.init(gameArea) || null;
       });
 
       chosen.forEach(emoji=>{
@@ -1859,6 +2015,72 @@
     }
   }
 
+  function buildSnowmanSVG(svg, s){
+    svg.innerHTML = '';
+    const el = (tag, attrs) => pzSvgEl(svg, tag, attrs);
+    el('circle', {cx:150,cy:250,r:72,fill:'white',stroke:'#3A2E27','stroke-width':4});
+    el('circle', {cx:150,cy:150,r:50,fill:'white',stroke:'#3A2E27','stroke-width':4});
+    el('circle', {cx:150,cy:78,r:34,fill:'white',stroke:'#3A2E27','stroke-width':4});
+
+    if(s.arms){
+      el('line', {x1:104,y1:150,x2:55,y2:115,stroke:'#5B3A1F','stroke-width':7,'stroke-linecap':'round'});
+      el('line', {x1:196,y1:150,x2:245,y2:115,stroke:'#5B3A1F','stroke-width':7,'stroke-linecap':'round'});
+    }
+    if(s.buttons){
+      el('circle',{cx:150,cy:130,r:6,fill:'#2B2B2B'});
+      el('circle',{cx:150,cy:150,r:6,fill:'#2B2B2B'});
+      el('circle',{cx:150,cy:170,r:6,fill:'#2B2B2B'});
+    }
+    if(s.scarf){
+      el('rect', {x:108,y:108,width:84,height:20,fill:'#E5473B'});
+      el('rect', {x:115,y:126,width:16,height:34,fill:'#E5473B'});
+    }
+    if(s.face){
+      el('circle', {cx:138,cy:72,r:4,fill:'#2B2B2B'});
+      el('circle', {cx:162,cy:72,r:4,fill:'#2B2B2B'});
+      [135,145,155,165].forEach((x,i)=> el('circle',{cx:x,cy:i===0||i===3?95:100,r:3,fill:'#2B2B2B'}));
+    }
+    if(s.nose){
+      el('path', {d:'M150,80 L178,87 L150,94 Z', fill:'#F0872E'});
+    }
+    if(s.hat){
+      el('rect', {x:108,y:40,width:84,height:9,rx:3,fill:'#1C3A52'});
+      el('rect', {x:125,y:2,width:50,height:40,fill:'#1C3A52'});
+    }
+  }
+
+  function buildTreeSVG(svg, s){
+    svg.innerHTML = '';
+    const el = (tag, attrs) => pzSvgEl(svg, tag, attrs);
+    el('rect', {x:135,y:260,width:30,height:30,fill:'#5B3A1F'});
+    el('path', {d:'M70,260 L230,260 L150,180 Z', fill:'#2E7D4F'});
+    el('path', {d:'M85,190 L215,190 L150,120 Z', fill:'#2E7D4F'});
+    el('path', {d:'M100,130 L200,130 L150,60 Z', fill:'#2E7D4F'});
+
+    if(s.garland){
+      el('path', {d:'M90,240 Q150,220 210,240', fill:'none', stroke:'#F4B93E','stroke-width':4});
+      el('path', {d:'M100,170 Q150,150 200,170', fill:'none', stroke:'#F4B93E','stroke-width':4});
+      el('path', {d:'M110,110 Q150,95 190,110', fill:'none', stroke:'#F4B93E','stroke-width':4});
+    }
+    if(s.ornaments){
+      [[110,230,'#E5473B'],[190,235,'#3B7DE5'],[130,170,'#F2C230'],[175,175,'#8B5FBF'],[130,110,'#E5473B'],[170,110,'#3EA35C']]
+        .forEach(([x,y,c])=> el('circle',{cx:x,cy:y,r:8,fill:c,stroke:'#3A2E27','stroke-width':2}));
+    }
+    if(s.gifts){
+      el('rect', {x:55,y:250,width:42,height:38,fill:'#E5473B'});
+      el('rect', {x:73,y:250,width:8,height:38,fill:'#F4B93E'});
+      el('rect', {x:205,y:255,width:36,height:33,fill:'#3B7DE5'});
+      el('rect', {x:220,y:255,width:8,height:33,fill:'#F4B93E'});
+    }
+    if(s.snow){
+      [[50,50],[90,90],[250,60],[220,100],[60,150],[260,150],[40,220],[270,220]]
+        .forEach(([x,y])=> el('circle',{cx:x,cy:y,r:4,fill:'white',stroke:'#9AA5B1','stroke-width':1}));
+    }
+    if(s.star){
+      el('path', {d:'M150,25 L156,42 L174,42 L159,53 L165,70 L150,59 L135,70 L141,53 L126,42 L144,42 Z', fill:'#F4B93E',stroke:'#C98F1F','stroke-width':2});
+    }
+  }
+
   const DRESS_THEMES = [
     {
       label:'Habille le bonhomme !', viewBox:'0 0 300 320', build: buildBonhommeSVG,
@@ -1871,7 +2093,7 @@
         {icon:'🤠', name:'chapeau cowboy', apply:(s)=>{ s.hat='cowboy'; }},
         {icon:'🎅', name:'bonnet de Noël', apply:(s)=>{ s.hat='santa'; }},
         {icon:'👑', name:'couronne', apply:(s)=>{ s.hat='crown'; }},
-        {icon:'💇', name:'moustache', apply:(s)=>{ s.mustache=!s.mustache; }},
+        {icon:'🥸', name:'moustache', apply:(s)=>{ s.mustache=!s.mustache; }},
         {icon:'🎀', name:'noeud papillon', apply:(s)=>{ s.bowtie=!s.bowtie; }}
       ]
     },
@@ -1886,6 +2108,31 @@
         {icon:'🌳', name:'arbre', apply:(s)=>{ s.tree=!s.tree; }},
         {icon:'🌸', name:'fleurs', apply:(s)=>{ s.flowers=!s.flowers; }},
         {icon:'💨', name:'fumée de cheminée', apply:(s)=>{ s.smoke=!s.smoke; }}
+      ]
+    },
+    {
+      label:'Habille le bonhomme de neige !', viewBox:'0 0 300 330', build: buildSnowmanSVG,
+      initialState: ()=>({face:false, nose:false, scarf:false, hat:false, buttons:false, arms:false}),
+      options:[
+        {icon:'🔄', name:'remettre à zéro', apply:(s)=>{ Object.keys(s).forEach(k=> s[k]=false); }},
+        {icon:'😀', name:'visage', apply:(s)=>{ s.face=!s.face; }},
+        {icon:'🥕', name:'nez carotte', apply:(s)=>{ s.nose=!s.nose; }},
+        {icon:'🧣', name:'écharpe', apply:(s)=>{ s.scarf=!s.scarf; }},
+        {icon:'🎩', name:'chapeau', apply:(s)=>{ s.hat=!s.hat; }},
+        {icon:'⚫', name:'boutons', apply:(s)=>{ s.buttons=!s.buttons; }},
+        {icon:'🌿', name:'bras', apply:(s)=>{ s.arms=!s.arms; }}
+      ]
+    },
+    {
+      label:'Décore le sapin de Noël !', viewBox:'40 20 260 280', build: buildTreeSVG,
+      initialState: ()=>({star:false, garland:false, ornaments:false, gifts:false, snow:false}),
+      options:[
+        {icon:'🔄', name:'remettre à zéro', apply:(s)=>{ Object.keys(s).forEach(k=> s[k]=false); }},
+        {icon:'⭐', name:'étoile', apply:(s)=>{ s.star=!s.star; }},
+        {icon:'✨', name:'guirlande', apply:(s)=>{ s.garland=!s.garland; }},
+        {icon:'🔴', name:'boules', apply:(s)=>{ s.ornaments=!s.ornaments; }},
+        {icon:'🎁', name:'cadeaux', apply:(s)=>{ s.gifts=!s.gifts; }},
+        {icon:'❄️', name:'neige', apply:(s)=>{ s.snow=!s.snow; }}
       ]
     }
   ];
